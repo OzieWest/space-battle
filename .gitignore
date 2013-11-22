@@ -6,3 +6,12 @@
 *.csproj
 *.unityproj
 *.sln
+
+/Assets/Editor
+/Assets/Standard Assets
+/Assets/Assembly-CSharp.pidb
+/Assets/Assembly-CSharp-Editor.pidb
+/Assets/Assembly-CSharp-firstpass.pidb
+/Assets/Assembly-UnityScript.pidb
+/Assets/Assembly-UnityScript-Editor.pidb
+/Assets/Assembly-UnityScript-firstpass.pidb
