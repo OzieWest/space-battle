@@ -1,41 +1,32 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
 using System.Collections;
 
-public class ShipController : MonoBehaviour {
+public class ShipController : MonoBehaviour
+{
+    #region Position
+    public float start_X;
+    public float start_Y;
+    public float start_Z;
+    #endregion
 
-    private Color mouseOverColor = Color.blue;
-    private Color originalColor = Color.yellow;
-    private bool dragging = false;
-    private float distance;
+    #region Prefabs
+    public GameObject p_ship1;
+    public GameObject p_ship2;
+    public GameObject p_ship3;
+    public GameObject p_ship4;
+    #endregion
 
-    void OnMouseEnter()
+    public void Start()
     {
-        renderer.material.color = mouseOverColor;
+        var ship = CreateShip(p_ship1, new Vector3(start_X, start_Y, start_Z));
     }
 
-    void OnMouseExit()
+    private GameObject CreateShip(GameObject ship, Vector3 position)
     {
-        renderer.material.color = originalColor;
-    }
-
-    void OnMouseDown()
-    {
-        distance = Vector3.Distance(transform.position, Camera.main.transform.position);
-        dragging = true;
-    }
-
-    void OnMouseUp()
-    {
-        dragging = false;
-    }
-
-    void Update()
-    {
-        if (dragging)
-        {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            Vector3 rayPoint = ray.GetPoint(distance);
-            transform.position = rayPoint;
-        }
+        var result = Instantiate(ship, position, Quaternion.identity) as GameObject;
+    
+        return result;
     }
 }

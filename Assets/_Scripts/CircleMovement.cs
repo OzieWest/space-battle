@@ -7,10 +7,10 @@ public class CircleMovement : MonoBehaviour
     public float rotateInnerSpeed;
 
     public void Update () {
-        transform.RotateAround(Vector3.zero, Vector3.up, rotateAroundSpeed * Time.deltaTime);
+        transform.RotateAround(Vector3.zero, Vector3.forward, rotateAroundSpeed * Time.deltaTime);
 
         transform.Rotate(
-            Vector3.up,
+            Vector3.forward,
             rotateInnerSpeed
         );
     }
