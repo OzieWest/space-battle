@@ -26,8 +26,6 @@ public class PlayerSelect : MonoBehaviour {
 
         if (Input.GetMouseButtonDown(0))
         {
-            
-
             var hitInfo = new RaycastHit();
             if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitInfo) && hitInfo.transform.tag == "Construction")
             {
