@@ -16,6 +16,8 @@ public class InventoryController : MonoBehaviour
 
 	private List<InventoryItem> _items;
 
+	public Texture btnTexture;
+
 	public void Start()
 	{
 		_items = new List<InventoryItem>();
@@ -34,19 +36,18 @@ public class InventoryController : MonoBehaviour
 		{
 			_window = GUI.Window(0, _window, CreateInventory, String.Empty);
 		}
+
+		GUI.Button(new Rect(10, 400, 128, 128), btnTexture);
 	}
 
 	public void CreateInventory(int windowId)
 	{
 		GUILayout.BeginArea(new Rect(_window.x + 5, _window.y + 10, _window.width, _window.height));
-
 		GUILayout.BeginVertical();
-
 		foreach (var item in _items)
-			GUILayout.Button(item.Name, GUILayout.Height(30));	
+			GUILayout.Button(item.Name, GUILayout.Height(30));
 		
 		GUILayout.EndVertical();
-
 		GUILayout.EndArea();
 	}
 
