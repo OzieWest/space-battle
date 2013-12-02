@@ -1,0 +1,11 @@
+fileFormatVersion: 2
+guid: 67e4b87b21c1a254ba6bcd4cd93b77ac
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - PF_shipSmall: {fileID: 100008, guid: e16c9de20b238c04e9c12868b302781e, type: 2}
+  - PF_shipMiddle: {fileID: 100008, guid: e16c9de20b238c04e9c12868b302781e, type: 2}
+  - PF_shipBig: {fileID: 100008, guid: e16c9de20b238c04e9c12868b302781e, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
