@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Collections;
 
-public class InventoryController : MonoBehaviour
+public class InventoryScript : BaseBehaviour<InventoryScript>
 {
 	#region MainWindow
 	public float startX;

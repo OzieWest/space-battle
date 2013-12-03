@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Collections;
 
-public class ShipRepository : MonoBehaviour
+public class ShipRepository : BaseBehaviour<ShipRepository>
 {
     #region Position
     public float start_X;
@@ -11,21 +11,13 @@ public class ShipRepository : MonoBehaviour
     public float start_Z;
     #endregion
 
-    #region Prefabs
-    public GameObject PF_shipSmall;
-    public GameObject PF_shipMiddle;
-    public GameObject PF_shipBig;
-    #endregion
-
-	private PlayerScript _player;
-
-    public void Start()
+	public List<GameObject> Ships;
+    
+	public void Start()
     {
-		_player = (PlayerScript)gameObject.GetComponent("player");
-	    if (_player)
-	    {
-		    throw new Exception("Player creation error");
-	    }
+	    Current = this;
+
+		Ships = new List<GameObject>();
     }
 
     public GameObject CreateShip(ShipType type, Vector3 position)
@@ -33,6 +25,8 @@ public class ShipRepository : MonoBehaviour
 	    var prefab = GetPrefabByType(type);
 
 		var result = (GameObject)Instantiate(prefab, position, prefab.transform.rotation);
+
+		Ships.Add(result);
 
         return result;
     }
@@ -44,13 +38,13 @@ public class ShipRepository : MonoBehaviour
 		switch (type)
 		{
 			case ShipType.Small:
-				result = PF_shipSmall;
+				result = PrefabFactory.SmallShip;
 				break;
 			case ShipType.Middle:
-				result = PF_shipMiddle;
+				result = PrefabFactory.MiddleShip;
 				break;
 			case ShipType.Big:
-				result = PF_shipBig;
+				result = PrefabFactory.BigShip;
 				break;
 		}
 

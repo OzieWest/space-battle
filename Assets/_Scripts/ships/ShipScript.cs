@@ -3,43 +3,43 @@ using System.Runtime.InteropServices;
 using UnityEngine;
 using System.Collections;
 
-public class ShipScript : MonoBehaviour
+public class ShipScript : BaseBehaviour<ShipScript>
 {
-	public float width;
-	public float height;
-	private Rect _window;
+	#region Window
+	public float windowWidth_gui;
+	public float windowHeight_gui;
+	private Rect _window_gui;
+	#endregion
 
-	public GameObject PF_Bullet;
-
-	public static GameObject CurrentShip;
-	public GameObject PF_SelectionRing;
-	private GameObject INS_selectionRing;
-
+	private ShipAction _shipAction;
 	private ShipType _shipType;
 	private Boolean _isSelected;
 
-	private ShipAction _currentAction;
-
 	public void Start()
 	{
-		INS_selectionRing = (GameObject)Instantiate(PF_SelectionRing, gameObject.transform.position, transform.rotation);
-		HideSelect();
+		Put(
+			"SelectionRing",
+			Inst(PrefabFactory.SelectionRing, gameObject.transform.position, transform.rotation)
+		);
+
+		HideSelectRing();
+
 		_isSelected = false;
 
-		_window = new Rect(10, 100, width, height);
+		_window_gui = new Rect(10, 100, windowWidth_gui, windowHeight_gui);
 
-		_currentAction = ShipAction.Unknown;
+		_shipAction = ShipAction.Unknown;
 	}
 
 	public void Update()
 	{
 		if (_isSelected)
 		{
-			ShowSelect();
+			ShowSelectRing();
 		}
 		else
 		{
-			HideSelect();
+			HideSelectRing();
 		}
 	}
 
@@ -47,7 +47,7 @@ public class ShipScript : MonoBehaviour
 	{
 		_isSelected = !_isSelected;
 
-		CurrentShip = _isSelected ? gameObject : null;
+		Current = _isSelected ? this : null;
 	}
 
 	public void OnMouseOver()
@@ -62,13 +62,13 @@ public class ShipScript : MonoBehaviour
 	{
 		if (_isSelected)
 		{
-			_window = GUI.Window(0, _window, CreateInventory, String.Empty);
+			_window_gui = GUI.Window(0, _window_gui, CreateInventory, String.Empty);
 		}
 	}
 
 	public void CreateInventory(int windowId)
 	{
-		GUILayout.BeginArea(new Rect(_window.x, _window.y, _window.width, _window.height));
+		GUILayout.BeginArea(new Rect(_window_gui.x, _window_gui.y, _window_gui.width, _window_gui.height));
 		GUILayout.BeginVertical();
 
 		if (GUILayout.Button("Move", GUILayout.Width(80), GUILayout.Height(30)))
@@ -90,13 +90,13 @@ public class ShipScript : MonoBehaviour
 		GUILayout.EndArea();
 	}
 
-	protected void ShowSelect()
+	protected void ShowSelectRing()
 	{
-		INS_selectionRing.active = true;
+		TurnOn("SelectionRing");
 	}
 
-	protected void HideSelect()
+	protected void HideSelectRing()
 	{
-		INS_selectionRing.active = false;
+		TurnOff("SelectionRing");
 	}
 }

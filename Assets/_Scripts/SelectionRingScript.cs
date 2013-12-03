@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class SCR_SelectionRing : MonoBehaviour {
+public class SelectionRingScript : MonoBehaviour {
 
 	public void Update () 
 	{

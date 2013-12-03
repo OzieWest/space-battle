@@ -2,8 +2,9 @@
 using UnityEngine;
 using System.Collections;
 
-public class PlaceController : MonoBehaviour
+public class PlaceController : BaseBehaviour<PlaceController>
 {
+	#region Coor
 	public float startX;
 	public float startY;
 
@@ -12,22 +13,28 @@ public class PlaceController : MonoBehaviour
 	public float placeScale;
 
 	public float offset;
+	#endregion
 
-	public GameObject place_prefab;
-
-	private List<GameObject> places;
+	private List<GameObject> _places;
 
 	public void Start()
 	{
-		places = new List<GameObject>();
+		Current = this;
 
+		_places = new List<GameObject>();
+
+		_createGrid();
+	}
+
+	private void _createGrid()
+	{
 		var startVector = new Vector3(startX, startY);
 
 		for (var i = 0; i < gridCount; i++)
 		{
 			for (var j = 0; j < gridCount; j++)
 			{
-				var obj = CreatePlace(startVector);
+				_createPlace(startVector);
 
 				startVector.x += placeScale + offset;
 			}
@@ -37,16 +44,11 @@ public class PlaceController : MonoBehaviour
 		}
 	}
 
-	public void Update()
+	private void _createPlace(Vector3 position)
 	{
-
-	}
-
-	private GameObject CreatePlace(Vector3 position)
-	{
-		var result = Instantiate(place_prefab, position, transform.rotation) as GameObject;
+		var result = Inst(PrefabFactory.Place, position, transform.rotation);
 		result.transform.localScale = new Vector3(placeScale, placeScale, 0.1f);
 
-		return result;
+		_places.Add(result);
 	}
 }
