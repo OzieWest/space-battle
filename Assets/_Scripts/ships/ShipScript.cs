@@ -6,20 +6,19 @@ using System.Collections;
 public class ShipScript : BaseBehaviour<ShipScript>
 {
 	#region Window
-	public float windowWidth_gui;
-	public float windowHeight_gui;
+	public float windowWidth_gui = 150f;
+	public float windowHeight_gui = 300f;
 	private Rect _window_gui;
 	#endregion
 
-	private ShipAction _shipAction;
-	private ShipType _shipType;
 	private Boolean _isSelected;
+	public ShipAction Action;
 
 	public void Start()
 	{
 		Put(
 			"SelectionRing",
-			Inst(PrefabFactory.SelectionRing, gameObject.transform.position, transform.rotation)
+			Inst(PrefabFactory.Current.SelectionRing, gameObject.transform.position, transform.rotation)
 		);
 
 		HideSelectRing();
@@ -27,8 +26,6 @@ public class ShipScript : BaseBehaviour<ShipScript>
 		_isSelected = false;
 
 		_window_gui = new Rect(10, 100, windowWidth_gui, windowHeight_gui);
-
-		_shipAction = ShipAction.Unknown;
 	}
 
 	public void Update()
@@ -74,16 +71,19 @@ public class ShipScript : BaseBehaviour<ShipScript>
 		if (GUILayout.Button("Move", GUILayout.Width(80), GUILayout.Height(30)))
 		{
 			print("move");
+			Action = ShipAction.Move;
 		}
 
 		if (GUILayout.Button("Attack", GUILayout.Width(80), GUILayout.Height(30)))
 		{
 			print("attack");
+			Action = ShipAction.Fire;
 		}
 
 		if (GUILayout.Button("Stay", GUILayout.Width(80), GUILayout.Height(30)))
 		{
 			print("stay");
+			Action = ShipAction.Stay;
 		}
 
 		GUILayout.EndVertical();

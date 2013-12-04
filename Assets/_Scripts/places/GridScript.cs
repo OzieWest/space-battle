@@ -2,7 +2,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class PlaceController : BaseBehaviour<PlaceController>
+public class GridScript : BaseBehaviour<GridScript>
 {
 	#region Coor
 	public float startX;
@@ -46,7 +46,8 @@ public class PlaceController : BaseBehaviour<PlaceController>
 
 	private void _createPlace(Vector3 position)
 	{
-		var result = Inst(PrefabFactory.Place, position, transform.rotation);
+		var result = Inst(PrefabFactory.Current.Place, position, transform.rotation);
+
 		result.transform.localScale = new Vector3(placeScale, placeScale, 0.1f);
 
 		_places.Add(result);

@@ -7,12 +7,15 @@ public class PlayerScript : BaseBehaviour<PlayerScript>
 	public String Name;
 	public int Score;
 	public ShipClassController ShipClassController { get; set; }
+	public GameObject IconMove { get; set; }
 
 	public void Start()
 	{
 		Current = this;
 
 		ShipClassController = new ShipClassController();
+
+		IconMove = Inst(PrefabFactory.Current.IconMove, Vector3.zero, Quaternion.identity);
 
 		CreateFleat();
 	}

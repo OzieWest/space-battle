@@ -38,13 +38,13 @@ public class ShipRepository : BaseBehaviour<ShipRepository>
 		switch (type)
 		{
 			case ShipType.Small:
-				result = PrefabFactory.SmallShip;
+				result = PrefabFactory.Current.SmallShip;
 				break;
 			case ShipType.Middle:
-				result = PrefabFactory.MiddleShip;
+				result = PrefabFactory.Current.MiddleShip;
 				break;
 			case ShipType.Big:
-				result = PrefabFactory.BigShip;
+				result = PrefabFactory.Current.BigShip;
 				break;
 		}
 
