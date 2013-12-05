@@ -4,31 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-public enum ShipType
-{
-	Unknown = 0,
-	Small,
-	Middle,
-	Big
-}
-
-public enum ShipAction
-{
-	Unknown = 0,
-	Move,
-	Stay,
-	Fire
-}
-
-public enum ShipState
-{
-	Unknown = 0,
-	Alive,
-	Wounded,
-	Dead
-}
-
-public class ShipClass
+public class ShipStruct : BaseBehaviour<ShipStruct>
 {
 	public int Id { get; set; }
 	
@@ -36,10 +12,10 @@ public class ShipClass
 	public ShipAction Action { get; set; }
 	public ShipState State { get; set; }
 
-	public int Health { get; set; }
+	public int Health;
 	public int Power { get; set; }
 
-	public ShipClass()
+	public void Start()
 	{
 		Id = 0;
 		
@@ -54,5 +30,16 @@ public class ShipClass
 	public Boolean IsAlive()
 	{
 		return Health > 0;
+	}
+
+	public void SetHealth(int a)
+	{
+		Health = a;
+		print("Health method: " + Health);
+	}
+
+	public void GetHealth()
+	{
+		print("Health: " + Health);
 	}
 }

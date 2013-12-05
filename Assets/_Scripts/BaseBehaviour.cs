@@ -3,6 +3,30 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
+public enum ShipType
+{
+	Unknown = 0,
+	Small,
+	Middle,
+	Big
+}
+
+public enum ShipAction
+{
+	Unknown = 0,
+	Move,
+	Stay,
+	Fire
+}
+
+public enum ShipState
+{
+	Unknown = 0,
+	Alive,
+	Wounded,
+	Dead
+}
+
 public class BaseBehaviour<U> : MonoBehaviour where U: class 
 {
 	public static U Current { get; set; }

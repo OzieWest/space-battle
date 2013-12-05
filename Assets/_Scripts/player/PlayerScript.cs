@@ -2,18 +2,27 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum PlayerAction
+{
+	Undefine,
+	Move,
+	Attack,
+	Stay
+}
+
 public class PlayerScript : BaseBehaviour<PlayerScript>
 {
 	public String Name;
 	public int Score;
-	public ShipClassController ShipClassController { get; set; }
 	public GameObject IconMove { get; set; }
+
+	public PlayerAction Action { get; set; }
 
 	public void Start()
 	{
 		Current = this;
 
-		ShipClassController = new ShipClassController();
+		Action = PlayerAction.Undefine;
 
 		IconMove = Inst(PrefabFactory.Current.IconMove, Vector3.zero, Quaternion.identity);
 
@@ -28,9 +37,10 @@ public class PlayerScript : BaseBehaviour<PlayerScript>
 
 	public void CreateFleat()
 	{
-		var ships = ShipClassController.GetAllShip();
+		var types = new List<ShipType>();
+		types.Add(ShipType.Small);
 
-		foreach (var ship in ships)
-			ShipRepository.Current.CreateShip(ship.Type, Vector3.zero);
+		foreach (var type in types)
+			ShipRepository.Current.CreateShip(type, Vector3.zero);
 	}
 }
