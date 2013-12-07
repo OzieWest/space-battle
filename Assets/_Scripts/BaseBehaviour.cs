@@ -6,58 +6,13 @@ using System.Collections.Generic;
 public class BaseBehaviour<U> : MonoBehaviour where U: class 
 {
 	public static U Current { get; set; }
-	public Dictionary<String, object> Objects { get; set; }
 
-	public BaseBehaviour()
-	{
-		Objects = new Dictionary<string, object>();
-		//WriteLine(this.GetType().ToString());
-	}
-	
-	public void Put(String key, object value)
-	{
-		Objects.Add(key, value);
-	}
-
-	public GameObject Get(String key)
-	{
-		if (Objects.ContainsKey(key))
-		{
-			return (GameObject)Objects[key];
-		}
-
-		return null;
-	}
-
-	public T Get<T>(String key) where T : class 
-	{
-		if (Objects.ContainsKey(key))
-		{
-			return (T)Objects[key];
-		}
-
-		return null;
-	}
+	public PrefabFactory PFactory { get { return PrefabFactory.Current; } }
+	public ImageFactory IFactory { get { return ImageFactory.Current; } }
 
 	public GameObject Inst(UnityEngine.Object prefab, Vector3 position, Quaternion rotation)
 	{
 		return (GameObject)Instantiate(prefab, position, rotation);
-	}
-
-	public void TurnOn(String key)
-	{
-		var obj = Get(key);
-
-		if (obj != null)
-			obj.SetActive(true);
-	}
-
-	public void TurnOff(String key)
-	{
-		var obj = Get(key);
-
-		if (obj != null)
-			obj.SetActive(false);
 	}
 
 	public void SetColor(Color color)
@@ -82,11 +37,15 @@ public class BaseBehaviour<U> : MonoBehaviour where U: class
 		}
 	}
 
-	public void WriteLine(String message)
+	public Quaternion Rotation
 	{
-		if (GameSettings.IsDebug)
+		get
 		{
-			print(message);
+			return gameObject.transform.rotation;
+		}
+		set
+		{
+			gameObject.transform.rotation = value;
 		}
 	}
 }

@@ -19,11 +19,15 @@ public class ShipRepository
     {
 	    var prefab = GetPrefabByType(type);
 
-		var result = _playerScript.Inst(prefab, position, prefab.transform.rotation);
+		var result = _playerScript.Inst(
+			prefab, 
+			position, 
+			prefab.transform.rotation
+		);
 
-		_configurateShip(ref result, type);
-
-		_ships.Add(result);
+		_ships.Add(
+			_configurateShip(result, type)
+		);
 
         return result;
     }
@@ -33,10 +37,8 @@ public class ShipRepository
 		return _ships;
 	}
 
-	private void _configurateShip(ref GameObject prefab, ShipType type)
+	private GameObject _configurateShip(GameObject prefab, ShipType type)
 	{
-		var shipStr = prefab.GetComponent<ShipScript>();
-
 		var shipStruct = new ShipStruct()
 		{
 			Health = GetHealthByType(type),
@@ -45,7 +47,11 @@ public class ShipRepository
 			State = DefaultState(),
 		};
 
-		shipStr.S = shipStruct;
+		var shipPrefab = prefab.GetComponent<ShipScript>();
+
+		shipPrefab.Struct = shipStruct;
+
+		return prefab;
 	}
 
 	private GameObject GetPrefabByType(ShipType type)

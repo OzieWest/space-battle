@@ -4,7 +4,7 @@ using UnityEngine;
 
 public enum PlayerAction
 {
-	Undefine,
+	Wait,
 	Move,
 	Attack,
 	Stay
@@ -24,7 +24,7 @@ public class PlayerScript : BaseBehaviour<PlayerScript>
 		Current = this;
 		ShipRepo = new ShipRepository(this);
 
-		Action = PlayerAction.Undefine;
+		Action = PlayerAction.Wait;
 
 		IconMove = Inst(PrefabFactory.Current.IconMove, Vector3.zero, Quaternion.identity);
 
@@ -35,6 +35,7 @@ public class PlayerScript : BaseBehaviour<PlayerScript>
 	{
 		GUI.Label(new Rect(5, 5, 150, 20), "Name: " + Name);
 		GUI.Label(new Rect(5, 25, 150, 20), "Score: " + Score.ToString());
+		GUI.Label(new Rect(5, 45, 150, 20), "Action: " + Action.ToString());
 	}
 
 	public void CreateFleat()
@@ -48,5 +49,30 @@ public class PlayerScript : BaseBehaviour<PlayerScript>
 		{
 			ShipRepo.CreateShip(type, Vector3.zero);
 		}
+	}
+
+	public void SetAction(PlayerAction action)
+	{
+		Action = action;
+	}
+
+	public void ResetAction()
+	{
+		Action = PlayerAction.Wait;
+	}
+
+	public Boolean IsActionMove()
+	{
+		return Action == PlayerAction.Move;
+	}
+
+	public Boolean IsActionAttack()
+	{
+		return Action == PlayerAction.Attack;
+	}
+
+	public Boolean IsActionStay()
+	{
+		return Action == PlayerAction.Stay;
 	}
 }

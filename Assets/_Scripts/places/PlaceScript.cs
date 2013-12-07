@@ -9,6 +9,9 @@ public class PlaceScript : BaseBehaviour<PlaceScript>
 	public static Color MouseOverColor;
 	public static Color MouseDownColor;
 
+	public ShipScript CurrentShip { get { return ShipScript.Current; } }
+	public PlayerScript Player { get { return PlayerScript.Current; } }
+
 	static PlaceScript()
 	{
 		DefaultColor = Color.white;
@@ -17,26 +20,28 @@ public class PlaceScript : BaseBehaviour<PlaceScript>
 
 	public void OnMouseDown()
 	{
-		if (PlayerScript.Current.Action == PlayerAction.Move)
+		if (Player.IsActionMove())
 		{
-			
+			CurrentShip.SetDestination(
+				Player.IconMove.transform.position
+			);
 		}
 	}
 
 	public void OnMouseOver()
 	{
-		if (PlayerScript.Current.Action == PlayerAction.Move)
+		if (Player.IsActionMove())
 		{
 			SetPosition(
-				PlayerScript.Current.IconMove,
+				Player.IconMove,
 				Position
 			);
 
-			if (!PlayerScript.Current.IconMove.active)
-				PlayerScript.Current.IconMove.SetActive(true);
+			if (!Player.IconMove.active)
+				Player.IconMove.SetActive(true);
 		}
 
-		if (IsShipSelect())
+		if (_isShipSelect())
 		{
 			SetColor(MouseOverColor);
 		}
@@ -44,22 +49,19 @@ public class PlaceScript : BaseBehaviour<PlaceScript>
 
 	public void OnMouseExit()
 	{
-		if (IsShipSelect())
+		if (_isShipSelect())
 		{
 			SetColor(DefaultColor);
 		}
 
-		if (PlayerScript.Current.IconMove.active)
-			PlayerScript.Current.IconMove.SetActive(false);
+		if (Player.IconMove.active)
+		{
+			Player.IconMove.SetActive(false);
+		}
 	}
 
-	public Boolean IsShipSelect()
+	private Boolean _isShipSelect()
 	{
-		return ShipScript.Current != null;
-	}
-
-	public Boolean IsShipMove()
-	{
-		return ShipScript.Current.S.Action == ShipAction.Move;
+		return CurrentShip != null;
 	}
 }

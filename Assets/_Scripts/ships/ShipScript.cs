@@ -5,73 +5,92 @@ using System.Collections;
 
 public class ShipScript : BaseBehaviour<ShipScript>
 {
-	public Rect WindowGui;
+	private Boolean _isSelected;
+	private Vector3 _endPosition;
+	private float _moveSpeed;
 
-	private Boolean _isSelected = false;
+	public Rect WindowGui { get; set; }
+	public ShipStruct Struct { get; set; }
 
-	public ShipStruct S { get; set; }
+	public PlayerScript Player { get { return PlayerScript.Current; } }
 
 	public void Start()
 	{
-		Put(
-			"SelectionRing",
-			Inst(PrefabFactory.Current.SelectionRing, gameObject.transform.position, transform.rotation)
-		);
+		_isSelected = false;
+		_moveSpeed = 0.01f;
 
 		WindowGui = new Rect(10, Screen.height - 50, 600, 150);
+		_endPosition = Vector3.zero;
 	}
 
 	public void Update()
 	{
-		_toggleSelectionIcon();
+		_moveShip();
 	}
 
 	public void OnMouseDown()
 	{
-		_isSelected = !_isSelected;
-
-		if (_isSelected)
+		if (Struct.Action == ShipAction.Stay)
 		{
-			Current = this;
+			_isSelected = !_isSelected;
+
+			if (_isSelected)
+			{
+				Current = this;
+			}
+			else
+			{
+				if (Current == null) return;
+
+				PlayerScript.Current.Action = PlayerAction.Stay;
+				Current = null;
+			}
 		}
-		else
-		{
-			if (Current == null) return;
-
-			PlayerScript.Current.Action = PlayerAction.Stay;
-			Current = null;
-		}
-	}
-
-	public void OnMouseOver()
-	{
-	}
-
-	public void OnMouseExit()
-	{
 	}
 
 	public void OnGUI()
 	{
 		if (_isSelected)
 		{
-			WindowGui = GUI.Window(0, WindowGui, CreateInventory, "Actions");
+			WindowGui = GUI.Window(0, WindowGui, _createInventory, "Ships actions");
 		}
 	}
 
-	private void _toggleSelectionIcon()
+	public void SetDestination(Vector3 destination)
 	{
-		if (_isSelected)
+		Current._endPosition = destination;
+	}
+
+	public Boolean IsShipMove()
+	{
+		return Struct.Action == ShipAction.Move;
+	}
+
+	public Boolean IsShipStay()
+	{
+		return Struct.Action == ShipAction.Stay;
+	}
+
+	public Boolean IsShipAttack()
+	{
+		return Struct.Action == ShipAction.Attack;
+	}
+
+	private void _moveShip()
+	{
+		if (_endPosition != Vector3.zero)
 		{
-			TurnOn("SelectionRing");
-		}
-		else
-		{
-			TurnOff("SelectionRing");
+			Position = Vector3.Lerp(Position, _endPosition, Time.time * _moveSpeed);
+
+			if (Position == _endPosition)
+			{
+				_endPosition = Vector3.zero;
+				Player.ResetAction();
+			}
 		}
 	}
 
-	private void CreateInventory(int windowId)
+	private void _createInventory(int windowId)
 	{
 		GUILayout.BeginArea(new Rect(5, 20, WindowGui.width, 100));
 		GUILayout.BeginHorizontal();
@@ -94,14 +113,14 @@ public class ShipScript : BaseBehaviour<ShipScript>
 			PlayerScript.Current.Action = PlayerAction.Stay;
 		}
 
-		GUILayout.Label("Health: " + Current.S.Health);
-		GUILayout.Label("Power: " + Current.S.Power);
+		GUILayout.Label("Health: " + Current.Struct.Health);
+		GUILayout.Label("Power: " + Current.Struct.Power);
+		GUILayout.Label("Action: " + Current.Struct.Action);
 
 		GUILayout.EndHorizontal();
 		GUILayout.EndArea();
 	}
 }
-
 
 public class ShipStruct
 {
@@ -140,7 +159,7 @@ public enum ShipAction
 	Unknown = 0,
 	Move,
 	Stay,
-	Fire
+	Attack
 }
 
 public enum ShipState
