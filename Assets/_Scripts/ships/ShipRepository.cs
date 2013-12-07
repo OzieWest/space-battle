@@ -6,33 +6,34 @@ using System.Collections;
 
 public class ShipRepository
 {
-	private List<GameObject> _ships;
-	private PlayerScript _playerScript;
+	private Dictionary<ShipType, GameObject> _ships;
+	private PlayerScript _player;
 
 	public ShipRepository(PlayerScript playerScript)
-    {
-		_ships = new List<GameObject>();
-		_playerScript = playerScript;
+	{
+		_ships = new Dictionary<ShipType, GameObject>();
+		_player = playerScript;
     }
 
     public GameObject CreateShip(ShipType type, Vector3 position)
     {
 	    var prefab = GetPrefabByType(type);
 
-		var result = _playerScript.Inst(
+		var result = _player.Inst(
 			prefab, 
 			position, 
 			prefab.transform.rotation
 		);
 
 		_ships.Add(
+			type,
 			_configurateShip(result, type)
 		);
 
         return result;
     }
 
-	public List<GameObject> GetAllShips()
+	public Dictionary<ShipType, GameObject> GetAllShips()
 	{
 		return _ships;
 	}
@@ -45,11 +46,14 @@ public class ShipRepository
 			Power = GetPowerByType(type),
 			Action = DefaultAction(),
 			State = DefaultState(),
+			Type = type
 		};
 
 		var shipPrefab = prefab.GetComponent<ShipScript>();
 
 		shipPrefab.Struct = shipStruct;
+
+		prefab.active = false;
 
 		return prefab;
 	}
@@ -63,7 +67,7 @@ public class ShipRepository
 			case ShipType.Small:
 				result = PrefabFactory.Current.SmallShip;
 				break;
-			case ShipType.Middle:
+			case ShipType.Medium:
 				result = PrefabFactory.Current.MiddleShip;
 				break;
 			case ShipType.Big:
@@ -96,7 +100,7 @@ public class ShipRepository
 			case ShipType.Small:
 				result = 1;
 				break;
-			case ShipType.Middle:
+			case ShipType.Medium:
 				result = 2;
 				break;
 			case ShipType.Big:
@@ -117,7 +121,7 @@ public class ShipRepository
 			case ShipType.Small:
 				result = 1;
 				break;
-			case ShipType.Middle:
+			case ShipType.Medium:
 				result = 2;
 				break;
 			case ShipType.Big:

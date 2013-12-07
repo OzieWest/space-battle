@@ -12,6 +12,8 @@ public class ShipScript : BaseBehaviour<ShipScript>
 	public Rect WindowGui { get; set; }
 	public ShipStruct Struct { get; set; }
 
+	public Boolean isActionDo;
+
 	public PlayerScript Player { get { return PlayerScript.Current; } }
 
 	public void Start()
@@ -19,8 +21,10 @@ public class ShipScript : BaseBehaviour<ShipScript>
 		_isSelected = false;
 		_moveSpeed = 0.01f;
 
-		WindowGui = new Rect(10, Screen.height - 50, 600, 150);
+		WindowGui = new Rect(5, 80, 150, 400);
 		_endPosition = Vector3.zero;
+
+		isActionDo = false;
 	}
 
 	public void Update()
@@ -32,6 +36,11 @@ public class ShipScript : BaseBehaviour<ShipScript>
 	{
 		if (Struct.Action == ShipAction.Stay)
 		{
+			if (Current == this)
+			{
+				Debug.Log("Z");
+			}
+
 			_isSelected = !_isSelected;
 
 			if (_isSelected)
@@ -42,8 +51,7 @@ public class ShipScript : BaseBehaviour<ShipScript>
 			{
 				if (Current == null) return;
 
-				PlayerScript.Current.Action = PlayerAction.Stay;
-				Current = null;
+				DeselectShip();
 			}
 		}
 	}
@@ -52,8 +60,17 @@ public class ShipScript : BaseBehaviour<ShipScript>
 	{
 		if (_isSelected)
 		{
-			WindowGui = GUI.Window(0, WindowGui, _createInventory, "Ships actions");
+			GUI.Label(new Rect(5, 80, 150, 20), "*" + Current.Struct.Type.ToString() + "Ship*");
+			GUI.Label(new Rect(5, 100, 150, 20), "Health: " + Current.Struct.Health);
+			GUI.Label(new Rect(5, 120, 150, 20), "Power: " + Current.Struct.Power);
+			GUI.Label(new Rect(5, 140, 150, 20), "Action: " + Current.Struct.Action);
 		}
+	}
+
+	private void DeselectShip()
+	{
+		Player.SetAction(PlayerAction.Wait);
+		Current = null;
 	}
 
 	public void SetDestination(Vector3 destination)
@@ -80,45 +97,20 @@ public class ShipScript : BaseBehaviour<ShipScript>
 	{
 		if (_endPosition != Vector3.zero)
 		{
+			Struct.Action = ShipAction.Move;
+
 			Position = Vector3.Lerp(Position, _endPosition, Time.time * _moveSpeed);
 
 			if (Position == _endPosition)
 			{
 				_endPosition = Vector3.zero;
 				Player.ResetAction();
+				
+				Struct.Action = ShipAction.Stay;
+
+				isActionDo = true;
 			}
 		}
-	}
-
-	private void _createInventory(int windowId)
-	{
-		GUILayout.BeginArea(new Rect(5, 20, WindowGui.width, 100));
-		GUILayout.BeginHorizontal();
-
-		if (GUILayout.Button("Move", GUILayout.Width(80), GUILayout.Height(30)))
-		{
-			print("move");
-			PlayerScript.Current.Action = PlayerAction.Move;
-		}
-
-		if (GUILayout.Button("Attack", GUILayout.Width(80), GUILayout.Height(30)))
-		{
-			print("attack");
-			PlayerScript.Current.Action = PlayerAction.Attack;
-		}
-
-		if (GUILayout.Button("Stay", GUILayout.Width(80), GUILayout.Height(30)))
-		{
-			print("stay");
-			PlayerScript.Current.Action = PlayerAction.Stay;
-		}
-
-		GUILayout.Label("Health: " + Current.Struct.Health);
-		GUILayout.Label("Power: " + Current.Struct.Power);
-		GUILayout.Label("Action: " + Current.Struct.Action);
-
-		GUILayout.EndHorizontal();
-		GUILayout.EndArea();
 	}
 }
 
@@ -150,7 +142,7 @@ public enum ShipType
 {
 	Unknown = 0,
 	Small,
-	Middle,
+	Medium,
 	Big
 }
 

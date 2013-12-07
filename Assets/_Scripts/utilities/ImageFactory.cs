@@ -3,8 +3,9 @@ using System.Collections;
 
 public class ImageFactory : BaseBehaviour<ImageFactory>
 {
-	public Texture2D IconAttack;
-	public Texture2D IconMove;
+	public Texture2D SmallShipPicture;
+	public Texture2D MediumShipPicture;
+	public Texture2D BigShipPicture;
 
 	public void Start()
 	{

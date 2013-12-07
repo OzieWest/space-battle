@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public enum PlayerAction
@@ -14,11 +15,14 @@ public class PlayerScript : BaseBehaviour<PlayerScript>
 {
 	public String Name;
 	public int Score;
-	public GameObject IconMove { get; set; }
+	public int ShipCount 
+	{
+		get { return ShipRepo.GetAllShips().Where(x => x.Value.active).Count(); }
+	}
 
 	public PlayerAction Action { get; set; }
 	public ShipRepository ShipRepo { get; set; }
-
+	
 	public void Start()
 	{
 		Current = this;
@@ -26,29 +30,46 @@ public class PlayerScript : BaseBehaviour<PlayerScript>
 
 		Action = PlayerAction.Wait;
 
-		IconMove = Inst(PrefabFactory.Current.IconMove, Vector3.zero, Quaternion.identity);
-
 		CreateFleat();
 	}
 
 	public void OnGUI()
 	{
-		GUI.Label(new Rect(5, 5, 150, 20), "Name: " + Name);
-		GUI.Label(new Rect(5, 25, 150, 20), "Score: " + Score.ToString());
-		GUI.Label(new Rect(5, 45, 150, 20), "Action: " + Action.ToString());
+		const int offset = 5;
+		const int widthLabel = 150;
+		const int heightLabel = 20;
+
+		GUI.Label(new Rect(offset, 5, widthLabel, heightLabel), "Name: " + Name);
+		GUI.Label(new Rect(offset, 25, widthLabel, heightLabel), "Score: " + Score);
+		GUI.Label(new Rect(offset, 45, widthLabel, heightLabel), "Action: " + Action);
+		GUI.Label(new Rect(offset, 65, widthLabel, heightLabel), "ShipCount: " + ShipCount);
+
+		var position = 85;
+		const int widthButton = 35;
+		const int heightButton = 35;
+
+		foreach (var ship in ShipRepo.GetAllShips().Where(ship => !ship.Value.active))
+		{
+			if (GUI.Button(new Rect(offset, position, widthButton, heightButton), GetImageByType(ship.Key)))
+			{
+				ship.Value.transform.position = GridScript.Current.GetRandomLocation().Position;
+				ship.Value.active = true;
+			}
+
+			position += 40;
+		}
 	}
 
 	public void CreateFleat()
 	{
 		var types = new List<ShipType>
 		{
-			ShipType.Small
+			ShipType.Small,
+			ShipType.Medium
 		};
 
 		foreach (var type in types)
-		{
 			ShipRepo.CreateShip(type, Vector3.zero);
-		}
 	}
 
 	public void SetAction(PlayerAction action)
@@ -74,5 +95,20 @@ public class PlayerScript : BaseBehaviour<PlayerScript>
 	public Boolean IsActionStay()
 	{
 		return Action == PlayerAction.Stay;
+	}
+
+	private Texture2D GetImageByType(ShipType type)
+	{
+		switch (type)
+		{
+			case ShipType.Small:
+				return IFactory.SmallShipPicture;
+			case ShipType.Medium:
+				return IFactory.MediumShipPicture;
+			case ShipType.Big:
+				return IFactory.BigShipPicture;
+		}
+
+		return null;
 	}
 }
