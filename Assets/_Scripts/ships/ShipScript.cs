@@ -5,18 +5,11 @@ using System.Collections;
 
 public class ShipScript : BaseBehaviour<ShipScript>
 {
-	#region Window
-	public float WindowW = 600f;
-	public float WindowH = 60f;
-	private Rect _window_gui;
-	#endregion
+	public Rect WindowGui;
 
 	private Boolean _isSelected = false;
 
-	public ShipStruct S
-	{
-		get { return gameObject.GetComponent<ShipStruct>(); }
-	}
+	public ShipStruct S { get; set; }
 
 	public void Start()
 	{
@@ -25,19 +18,12 @@ public class ShipScript : BaseBehaviour<ShipScript>
 			Inst(PrefabFactory.Current.SelectionRing, gameObject.transform.position, transform.rotation)
 		);
 
-		_window_gui = new Rect(10, Screen.height - 50, WindowW, WindowH);
+		WindowGui = new Rect(10, Screen.height - 50, 600, 150);
 	}
 
 	public void Update()
 	{
-		if (_isSelected)
-		{
-			TurnOn("SelectionRing");
-		}
-		else
-		{
-			TurnOff("SelectionRing");
-		}
+		_toggleSelectionIcon();
 	}
 
 	public void OnMouseDown()
@@ -50,11 +36,10 @@ public class ShipScript : BaseBehaviour<ShipScript>
 		}
 		else
 		{
-			if (Current != null)
-			{
-				PlayerScript.Current.Action = PlayerAction.Undefine;
-				Current = null;
-			}
+			if (Current == null) return;
+
+			PlayerScript.Current.Action = PlayerAction.Stay;
+			Current = null;
 		}
 	}
 
@@ -70,13 +55,25 @@ public class ShipScript : BaseBehaviour<ShipScript>
 	{
 		if (_isSelected)
 		{
-			_window_gui = GUI.Window(0, _window_gui, CreateInventory, "Actions");
+			WindowGui = GUI.Window(0, WindowGui, CreateInventory, "Actions");
 		}
 	}
 
-	public void CreateInventory(int windowId)
+	private void _toggleSelectionIcon()
 	{
-		GUILayout.BeginArea(new Rect(5, 20, _window_gui.width, 100));
+		if (_isSelected)
+		{
+			TurnOn("SelectionRing");
+		}
+		else
+		{
+			TurnOff("SelectionRing");
+		}
+	}
+
+	private void CreateInventory(int windowId)
+	{
+		GUILayout.BeginArea(new Rect(5, 20, WindowGui.width, 100));
 		GUILayout.BeginHorizontal();
 
 		if (GUILayout.Button("Move", GUILayout.Width(80), GUILayout.Height(30)))
@@ -103,4 +100,53 @@ public class ShipScript : BaseBehaviour<ShipScript>
 		GUILayout.EndHorizontal();
 		GUILayout.EndArea();
 	}
+}
+
+
+public class ShipStruct
+{
+	public int Id { get; set; }
+
+	public ShipType Type { get; set; }
+	public ShipAction Action { get; set; }
+	public ShipState State { get; set; }
+
+	public int Health;
+	public int Power { get; set; }
+
+	public void Start()
+	{
+		Id = 0;
+
+		Type = ShipType.Unknown;
+		Action = ShipAction.Unknown;
+		State = ShipState.Unknown;
+
+		Power = 0;
+		Health = 0;
+	}
+}
+
+public enum ShipType
+{
+	Unknown = 0,
+	Small,
+	Middle,
+	Big
+}
+
+public enum ShipAction
+{
+	Unknown = 0,
+	Move,
+	Stay,
+	Fire
+}
+
+public enum ShipState
+{
+	Unknown = 0,
+	Alive,
+	Wounded,
+	Dead
 }

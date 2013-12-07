@@ -4,24 +4,24 @@ using System.Linq;
 using UnityEngine;
 using System.Collections;
 
-public class ShipRepository : BaseBehaviour<ShipRepository>
+public class ShipRepository
 {
 	private List<GameObject> _ships;
-    
-	public void Start()
-    {
-	    Current = this;
+	private PlayerScript _playerScript;
 
+	public ShipRepository(PlayerScript playerScript)
+    {
 		_ships = new List<GameObject>();
+		_playerScript = playerScript;
     }
 
     public GameObject CreateShip(ShipType type, Vector3 position)
     {
 	    var prefab = GetPrefabByType(type);
 
-		SetUpStruct(ref prefab, type);
+		var result = _playerScript.Inst(prefab, position, prefab.transform.rotation);
 
-		var result = (GameObject)Instantiate(prefab, position, prefab.transform.rotation);
+		_configurateShip(ref result, type);
 
 		_ships.Add(result);
 
@@ -33,13 +33,19 @@ public class ShipRepository : BaseBehaviour<ShipRepository>
 		return _ships;
 	}
 
-	public void SetUpStruct(ref GameObject prefab, ShipType type)
+	private void _configurateShip(ref GameObject prefab, ShipType type)
 	{
-		var shipStr = prefab.GetComponent<ShipStruct>();
-		shipStr.Health = GetHealthByType(type);
-		shipStr.Power = GetPowerByType(type);
-		shipStr.Action = DefaultAction();
-		shipStr.State = DefaultState();
+		var shipStr = prefab.GetComponent<ShipScript>();
+
+		var shipStruct = new ShipStruct()
+		{
+			Health = GetHealthByType(type),
+			Power = GetPowerByType(type),
+			Action = DefaultAction(),
+			State = DefaultState(),
+		};
+
+		shipStr.S = shipStruct;
 	}
 
 	private GameObject GetPrefabByType(ShipType type)

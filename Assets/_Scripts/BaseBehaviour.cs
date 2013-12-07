@@ -3,30 +3,6 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public enum ShipType
-{
-	Unknown = 0,
-	Small,
-	Middle,
-	Big
-}
-
-public enum ShipAction
-{
-	Unknown = 0,
-	Move,
-	Stay,
-	Fire
-}
-
-public enum ShipState
-{
-	Unknown = 0,
-	Alive,
-	Wounded,
-	Dead
-}
-
 public class BaseBehaviour<U> : MonoBehaviour where U: class 
 {
 	public static U Current { get; set; }
@@ -35,6 +11,7 @@ public class BaseBehaviour<U> : MonoBehaviour where U: class
 	public BaseBehaviour()
 	{
 		Objects = new Dictionary<string, object>();
+		//WriteLine(this.GetType().ToString());
 	}
 	
 	public void Put(String key, object value)
@@ -102,6 +79,14 @@ public class BaseBehaviour<U> : MonoBehaviour where U: class
 		set
 		{
 			gameObject.transform.position = value;
+		}
+	}
+
+	public void WriteLine(String message)
+	{
+		if (GameSettings.IsDebug)
+		{
+			print(message);
 		}
 	}
 }

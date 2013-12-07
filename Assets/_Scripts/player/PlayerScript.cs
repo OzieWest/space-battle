@@ -17,10 +17,12 @@ public class PlayerScript : BaseBehaviour<PlayerScript>
 	public GameObject IconMove { get; set; }
 
 	public PlayerAction Action { get; set; }
+	public ShipRepository ShipRepo { get; set; }
 
 	public void Start()
 	{
 		Current = this;
+		ShipRepo = new ShipRepository(this);
 
 		Action = PlayerAction.Undefine;
 
@@ -37,10 +39,14 @@ public class PlayerScript : BaseBehaviour<PlayerScript>
 
 	public void CreateFleat()
 	{
-		var types = new List<ShipType>();
-		types.Add(ShipType.Small);
+		var types = new List<ShipType>
+		{
+			ShipType.Small
+		};
 
 		foreach (var type in types)
-			ShipRepository.Current.CreateShip(type, Vector3.zero);
+		{
+			ShipRepo.CreateShip(type, Vector3.zero);
+		}
 	}
 }
