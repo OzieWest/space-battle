@@ -6,16 +6,16 @@ using System.Collections;
 
 public class ShipRepository
 {
-	private Dictionary<ShipType, GameObject> _ships;
-	private PlayerScript _player;
+	private Dictionary<ShipType, Ship> _ships;
+	private Player _player;
 
-	public ShipRepository(PlayerScript playerScript)
+	public ShipRepository(Player player)
 	{
-		_ships = new Dictionary<ShipType, GameObject>();
-		_player = playerScript;
+		_ships = new Dictionary<ShipType, Ship>();
+		_player = player;
     }
 
-    public GameObject CreateShip(ShipType type, Vector3 position)
+	public GameObject CreateShip(ShipType type, Vector3 position)
     {
 	    var prefab = GetPrefabByType(type);
 
@@ -33,13 +33,15 @@ public class ShipRepository
         return result;
     }
 
-	public Dictionary<ShipType, GameObject> GetAllShips()
+	public Dictionary<ShipType, Ship> GetAllShips()
 	{
 		return _ships;
 	}
 
-	private GameObject _configurateShip(GameObject prefab, ShipType type)
+	private Ship _configurateShip(GameObject prefab, ShipType type)
 	{
+		prefab.active = false;
+
 		var shipStruct = new ShipStruct()
 		{
 			Health = GetHealthByType(type),
@@ -49,13 +51,10 @@ public class ShipRepository
 			Type = type
 		};
 
-		var shipPrefab = prefab.GetComponent<ShipScript>();
-
+		var shipPrefab = prefab.GetComponent<Ship>();
 		shipPrefab.Struct = shipStruct;
 
-		prefab.active = false;
-
-		return prefab;
+		return shipPrefab;
 	}
 
 	private GameObject GetPrefabByType(ShipType type)

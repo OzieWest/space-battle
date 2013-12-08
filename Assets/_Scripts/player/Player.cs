@@ -11,18 +11,16 @@ public enum PlayerAction
 	Stay
 }
 
-public class PlayerScript : BaseBehaviour<PlayerScript>
+public class Player : BaseBehaviour<Player>
 {
 	public String Name;
 	public int Score;
-	public int ShipCount 
-	{
-		get { return ShipRepo.GetAllShips().Where(x => x.Value.active).Count(); }
-	}
+	public int ShipCount { get { return ShipRepo.GetAllShips().Where(x => x.Value.active).Count(); } }
 
 	public PlayerAction Action { get; set; }
 	public ShipRepository ShipRepo { get; set; }
-	
+	public GridController Grid { get { return GridController.Current; } }
+
 	public void Start()
 	{
 		Current = this;
@@ -52,8 +50,9 @@ public class PlayerScript : BaseBehaviour<PlayerScript>
 		{
 			if (GUI.Button(new Rect(offset, position, widthButton, heightButton), GetImageByType(ship.Key)))
 			{
-				ship.Value.transform.position = GridScript.Current.GetRandomLocation().Position;
-				ship.Value.active = true;
+				var freePlace = Grid.GetRandomLocation();
+
+				ship.Value.Move(freePlace);
 			}
 
 			position += 40;

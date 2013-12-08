@@ -11,10 +11,6 @@ public class PrefabFactory : BaseBehaviour<PrefabFactory>
 	
 	public GameObject Place;
 
-	public GameObject SelectionRing;
-	public GameObject IconMove;
-	public GameObject IconAttack;
-
 	public void Start()
 	{
 		Current = this;

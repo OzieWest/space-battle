@@ -3,22 +3,22 @@ using System.Runtime.InteropServices;
 using UnityEngine;
 using System.Collections;
 
-public class ShipScript : BaseBehaviour<ShipScript>
+public class Ship : BaseBehaviour<Ship>
 {
-	private Boolean _isSelected;
 	private Vector3 _endPosition;
 	private float _moveSpeed;
 
+	private Boolean IsSelected { get { return Current == this; }}
 	public Rect WindowGui { get; set; }
 	public ShipStruct Struct { get; set; }
 
 	public Boolean isActionDo;
 
-	public PlayerScript Player { get { return PlayerScript.Current; } }
+	public Player Player { get { return Player.Current; } }
+	public Place Place { get; set; }
 
 	public void Start()
 	{
-		_isSelected = false;
 		_moveSpeed = 0.01f;
 
 		WindowGui = new Rect(5, 80, 150, 400);
@@ -41,16 +41,10 @@ public class ShipScript : BaseBehaviour<ShipScript>
 				Debug.Log("Z");
 			}
 
-			_isSelected = !_isSelected;
+			Current = IsSelected ? null : this;
 
-			if (_isSelected)
+			if (!IsSelected)
 			{
-				Current = this;
-			}
-			else
-			{
-				if (Current == null) return;
-
 				DeselectShip();
 			}
 		}
@@ -58,12 +52,16 @@ public class ShipScript : BaseBehaviour<ShipScript>
 
 	public void OnGUI()
 	{
-		if (_isSelected)
+		var offset = 5;
+		var widthLabel = 150;
+		var heightLabel = 20;
+
+		if (IsSelected)
 		{
-			GUI.Label(new Rect(5, 80, 150, 20), "*" + Current.Struct.Type.ToString() + "Ship*");
-			GUI.Label(new Rect(5, 100, 150, 20), "Health: " + Current.Struct.Health);
-			GUI.Label(new Rect(5, 120, 150, 20), "Power: " + Current.Struct.Power);
-			GUI.Label(new Rect(5, 140, 150, 20), "Action: " + Current.Struct.Action);
+			GUI.Label(new Rect(offset, 150, widthLabel, heightLabel), "*" + Current.Struct.Type + "Ship*");
+			GUI.Label(new Rect(offset, 170, widthLabel, heightLabel), "Health: " + Current.Struct.Health);
+			GUI.Label(new Rect(offset, 190, widthLabel, heightLabel), "Power: " + Current.Struct.Power);
+			GUI.Label(new Rect(offset, 210, widthLabel, heightLabel), "Action: " + Current.Struct.Action);
 		}
 	}
 
@@ -76,6 +74,16 @@ public class ShipScript : BaseBehaviour<ShipScript>
 	public void SetDestination(Vector3 destination)
 	{
 		Current._endPosition = destination;
+	}
+
+	public void Move(Place place)
+	{
+		Place = place;
+
+		place.IsFree = false;
+
+		transform.position = place.Position;
+		active = true;
 	}
 
 	public Boolean IsShipMove()
