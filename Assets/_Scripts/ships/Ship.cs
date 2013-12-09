@@ -5,15 +5,16 @@ using System.Collections;
 
 public class Ship : BaseBehaviour<Ship>
 {
+	public Rect WindowGui { get; set; }
+
 	private Vector3 _endPosition;
 	private float _moveSpeed;
-
-	private Boolean IsSelected { get { return Current == this; }}
-	public Rect WindowGui { get; set; }
 	public ShipStruct Struct { get; set; }
+	private Boolean IsSelected { get { return Current == this; } }
 
-	public Boolean isActionDo;
+	public Boolean IsActionDo;
 
+	public GridController Grid { get { return GridController.Current; } }
 	public Player Player { get { return Player.Current; } }
 	public Place Place { get; set; }
 
@@ -24,7 +25,7 @@ public class Ship : BaseBehaviour<Ship>
 		WindowGui = new Rect(5, 80, 150, 400);
 		_endPosition = Vector3.zero;
 
-		isActionDo = false;
+		IsActionDo = false;
 	}
 
 	public void Update()
@@ -36,9 +37,9 @@ public class Ship : BaseBehaviour<Ship>
 	{
 		if (Struct.Action == ShipAction.Stay)
 		{
-			if (Current == this)
+			if (Current != this)
 			{
-				Debug.Log("Z");
+				Grid.ResetSprites();
 			}
 
 			Current = IsSelected ? null : this;
@@ -65,23 +66,28 @@ public class Ship : BaseBehaviour<Ship>
 		}
 	}
 
-	private void DeselectShip()
+	public void DeselectShip()
 	{
 		Player.SetAction(PlayerAction.Wait);
 		Current = null;
 	}
 
-	public void SetDestination(Vector3 destination)
+	public void SetDestination(Place newPlace)
 	{
-		Current._endPosition = destination;
+		Place.Free();
+
+		Place = newPlace;
+		Current._endPosition = Place.Position;
+
+		Place.NotFree();
+
+		DeselectShip();
 	}
 
-	public void Move(Place place)
+	public void SetStartPosition(Place place)
 	{
 		Place = place;
-
 		place.IsFree = false;
-
 		transform.position = place.Position;
 		active = true;
 	}
@@ -113,10 +119,10 @@ public class Ship : BaseBehaviour<Ship>
 			{
 				_endPosition = Vector3.zero;
 				Player.ResetAction();
-				
+
 				Struct.Action = ShipAction.Stay;
 
-				isActionDo = true;
+				IsActionDo = true;
 			}
 		}
 	}

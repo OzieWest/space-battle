@@ -52,7 +52,7 @@ public class Player : BaseBehaviour<Player>
 			{
 				var freePlace = Grid.GetRandomLocation();
 
-				ship.Value.Move(freePlace);
+				ship.Value.SetStartPosition(freePlace);
 			}
 
 			position += 40;

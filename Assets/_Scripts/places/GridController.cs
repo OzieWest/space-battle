@@ -47,10 +47,26 @@ public class GridController : BaseBehaviour<GridController>
 			{
 				place.SetSprite(IconMove);
 			}
+
+			foreach (var place in this)
+			{
+				if (place.GetSprite() != IconMove && place.GetSprite() != IconAttack && place.IsFree)
+				{
+					place.SetSprite(IconAttack);
+				}
+			}
 		}
 		else
 		{
-			foreach (var place in this)
+			ResetSprites();
+		}
+	}
+
+	public void ResetSprites()
+	{
+		foreach (var place in this)
+		{
+			if (place.GetSprite() != IconDefault)
 			{
 				place.SetSprite(IconDefault);
 			}

@@ -15,6 +15,7 @@ public class Place : BaseBehaviour<Place>
 
 	public Ship CurrentShip { get { return Ship.Current; } }
 	public Player Player { get { return Player.Current; } }
+	public GridController Grid { get { return GridController.Current; } }
 
 	public void Start()
 	{
@@ -23,23 +24,22 @@ public class Place : BaseBehaviour<Place>
 
 	public void OnMouseDown()
 	{
-		
-	}
-
-	public void OnMouseOver()
-	{
-		
-	}
-
-	public void OnMouseExit()
-	{
-		
+		if (GetSprite() == Grid.IconMove)
+		{
+			CurrentShip.SetDestination(this);
+		}
 	}
 	
 	public void SetSprite(Sprite sprite)
 	{
 		var spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
 		spriteRenderer.sprite = sprite;
+	}
+
+	public Sprite GetSprite()
+	{
+		var spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
+		return spriteRenderer.sprite;
 	}
 
 	private Boolean _isShipSelect()
@@ -64,5 +64,15 @@ public class Place : BaseBehaviour<Place>
 			result.Add(Right);
 
 		return result;
+	}
+
+	public void Free()
+	{
+		IsFree = true;
+	}
+
+	public void NotFree()
+	{
+		IsFree = false;
 	}
 }
