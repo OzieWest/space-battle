@@ -13,25 +13,24 @@ public class ShipRepository
 	{
 		_ships = new Dictionary<ShipType, Ship>();
 		_player = player;
-    }
+	}
 
-	public GameObject CreateShip(ShipType type, Vector3 position)
-    {
-	    var prefab = GetPrefabByType(type);
+	public Ship CreateShip(ShipType type, Vector3 position)
+	{
+		var prefab = GetPrefabByType(type);
 
 		var result = _player.Inst(
-			prefab, 
-			position, 
+			prefab,
+			position,
 			prefab.transform.rotation
 		);
 
-		_ships.Add(
-			type,
-			_configurateShip(result, type)
-		);
+		var ship = _configurateShip(result, type);
 
-        return result;
-    }
+		_ships.Add(type, ship);
+
+		return ship;
+	}
 
 	public Dictionary<ShipType, Ship> GetAllShips()
 	{

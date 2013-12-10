@@ -9,14 +9,11 @@ using Random = UnityEngine.Random;
 public class GridController : BaseBehaviour<GridController>
 {
 	#region Coor
-	public float startX;
-	public float startY;
+	private int gridX = 10;
+	private int gridY = 8;
 
-	public int gridCount;
-
-	public float placeScale;
-
-	public float offset;
+	public float placeScale = 1;
+	public float offset = 1;
 	#endregion
 
 	public Sprite IconDefault;
@@ -45,14 +42,14 @@ public class GridController : BaseBehaviour<GridController>
 			var places = CurrentShip.Place.GetNeighbors();
 			foreach (var place in places)
 			{
-				place.SetSprite(IconMove);
+				place.SetSprite(IconMove, Color.blue);
 			}
 
 			foreach (var place in this)
 			{
 				if (place.GetSprite() != IconMove && place.GetSprite() != IconAttack && place.IsFree)
 				{
-					place.SetSprite(IconAttack);
+					place.SetSprite(IconAttack, Color.red);
 				}
 			}
 		}
@@ -68,7 +65,7 @@ public class GridController : BaseBehaviour<GridController>
 		{
 			if (place.GetSprite() != IconDefault)
 			{
-				place.SetSprite(IconDefault);
+				place.SetSprite(IconDefault, Color.white);
 			}
 		}
 	}
@@ -96,7 +93,7 @@ public class GridController : BaseBehaviour<GridController>
 					place.Top = _places[i][j - 1];
 				}
 
-				if (j < _places.Count - 1)
+				if (j < _places[i].Count - 1)
 				{
 					place.Bottom = _places[i][j + 1];
 				}
@@ -112,7 +109,7 @@ public class GridController : BaseBehaviour<GridController>
 	public Place GetRandomLocation()
 	{
 		var firstInt = Random.Range(7, 10);
-		var secondInt = Random.Range(0, 10);
+		var secondInt = Random.Range(0, 8);
 
 		var place = _places[firstInt][secondInt];
 
@@ -124,13 +121,14 @@ public class GridController : BaseBehaviour<GridController>
 
 	private void _createGrid()
 	{
-		var startVector = new Vector3(startX, startY);
+		var startVector = Camera.main.ScreenToWorldPoint(new Vector3(50, Screen.height - 50, 20));
+		var startX = startVector.x;
 
-		for (var i = 0; i < gridCount; i++)
+		for (var i = 0; i < gridX; i++)
 		{
 			var innerList = new List<Place>();
 
-			for (var j = 0; j < gridCount; j++)
+			for (var j = 0; j < gridY; j++)
 			{
 				innerList.Add(
 					_createPlace(startVector)
@@ -138,7 +136,7 @@ public class GridController : BaseBehaviour<GridController>
 
 				startVector.x += placeScale + offset;
 			}
-
+			
 			_places.Add(innerList);
 
 			startVector.x = startX;
@@ -156,7 +154,7 @@ public class GridController : BaseBehaviour<GridController>
 		var result = Inst(PrefabFactory.Current.Place, position, transform.rotation);
 
 		var place = result.GetComponent<Place>();
-		place.SetSprite(IconDefault);
+		place.SetSprite(IconDefault, Color.white);
 
 		return place;
 	}

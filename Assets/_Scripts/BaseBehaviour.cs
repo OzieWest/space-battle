@@ -15,6 +15,12 @@ public class BaseBehaviour<U> : MonoBehaviour where U: class
 		return (GameObject)Instantiate(prefab, position, rotation);
 	}
 
+	public U Inst<U>(UnityEngine.Object prefab, Vector3 position, Quaternion rotation) where U : Component
+	{
+		var newObj = (GameObject)Instantiate(prefab, position, rotation);
+		return newObj.GetComponent<U>();
+	}
+
 	public void SetColor(Color color)
 	{
 		gameObject.renderer.material.color = color;

@@ -28,12 +28,17 @@ public class Place : BaseBehaviour<Place>
 		{
 			CurrentShip.SetDestination(this);
 		}
+		else if (GetSprite() == Grid.IconAttack)
+		{
+			CurrentShip.Attack(this);
+		}
 	}
 	
-	public void SetSprite(Sprite sprite)
+	public void SetSprite(Sprite sprite, Color color)
 	{
 		var spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
 		spriteRenderer.sprite = sprite;
+		spriteRenderer.color = color;
 	}
 
 	public Sprite GetSprite()

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using UnityEngine;
 using System.Collections;
@@ -20,7 +21,7 @@ public class Ship : BaseBehaviour<Ship>
 
 	public void Start()
 	{
-		_moveSpeed = 0.01f;
+		_moveSpeed = 4f;
 
 		WindowGui = new Rect(5, 80, 150, 400);
 		_endPosition = Vector3.zero;
@@ -53,16 +54,17 @@ public class Ship : BaseBehaviour<Ship>
 
 	public void OnGUI()
 	{
-		var offset = 5;
+		var coorX = 120;
+		var coorY = Screen.height - 100;
 		var widthLabel = 150;
 		var heightLabel = 20;
 
 		if (IsSelected)
 		{
-			GUI.Label(new Rect(offset, 150, widthLabel, heightLabel), "*" + Current.Struct.Type + "Ship*");
-			GUI.Label(new Rect(offset, 170, widthLabel, heightLabel), "Health: " + Current.Struct.Health);
-			GUI.Label(new Rect(offset, 190, widthLabel, heightLabel), "Power: " + Current.Struct.Power);
-			GUI.Label(new Rect(offset, 210, widthLabel, heightLabel), "Action: " + Current.Struct.Action);
+			GUI.Label(new Rect(coorX, coorY, widthLabel, heightLabel), "*" + Current.Struct.Type + "Ship*");
+			GUI.Label(new Rect(coorX, coorY + 20, widthLabel, heightLabel), "Health: " + Current.Struct.Health);
+			GUI.Label(new Rect(coorX, coorY + 40, widthLabel, heightLabel), "Power: " + Current.Struct.Power);
+			GUI.Label(new Rect(coorX, coorY + 60, widthLabel, heightLabel), "Action: " + Current.Struct.Action);
 		}
 	}
 
@@ -92,6 +94,13 @@ public class Ship : BaseBehaviour<Ship>
 		active = true;
 	}
 
+	public void Attack(Place place)
+	{
+		var bullet = Inst<Bullet>(PFactory.Bullet, Position, Quaternion.identity);
+		print("2");
+		bullet.EndPosition = place.Position;
+	}
+
 	public Boolean IsShipMove()
 	{
 		return Struct.Action == ShipAction.Move;
@@ -113,7 +122,7 @@ public class Ship : BaseBehaviour<Ship>
 		{
 			Struct.Action = ShipAction.Move;
 
-			Position = Vector3.Lerp(Position, _endPosition, Time.time * _moveSpeed);
+			Position = Vector3.Lerp(Position, _endPosition, Time.deltaTime * _moveSpeed);
 
 			if (Position == _endPosition)
 			{

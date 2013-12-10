@@ -33,18 +33,18 @@ public class Player : BaseBehaviour<Player>
 
 	public void OnGUI()
 	{
-		const int offset = 5;
 		const int widthLabel = 150;
 		const int heightLabel = 20;
 
-		GUI.Label(new Rect(offset, 5, widthLabel, heightLabel), "Name: " + Name);
-		GUI.Label(new Rect(offset, 25, widthLabel, heightLabel), "Score: " + Score);
-		GUI.Label(new Rect(offset, 45, widthLabel, heightLabel), "Action: " + Action);
-		GUI.Label(new Rect(offset, 65, widthLabel, heightLabel), "ShipCount: " + ShipCount);
+		var offset = 5;
+		var position = Screen.height - 60;
+		const int widthButton = 50;
+		const int heightButton = 50;
 
-		var position = 85;
-		const int widthButton = 35;
-		const int heightButton = 35;
+		//GUI.Label(new Rect(offset, 5, widthLabel, heightLabel), "Name: " + Name);
+		//GUI.Label(new Rect(offset, 25, widthLabel, heightLabel), "Score: " + Score);
+		//GUI.Label(new Rect(offset, 45, widthLabel, heightLabel), "Action: " + Action);
+		//GUI.Label(new Rect(offset, 65, widthLabel, heightLabel), "ShipCount: " + ShipCount);
 
 		foreach (var ship in ShipRepo.GetAllShips().Where(ship => !ship.Value.active))
 		{
@@ -55,7 +55,7 @@ public class Player : BaseBehaviour<Player>
 				ship.Value.SetStartPosition(freePlace);
 			}
 
-			position += 40;
+			offset += 60;
 		}
 	}
 
