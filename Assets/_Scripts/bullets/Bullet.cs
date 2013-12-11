@@ -4,13 +4,13 @@ using System.Collections;
 
 public class Bullet : BaseBehaviour<Bullet>
 {
-	public float _moveSpeed = 20.0f;
+	public float _moveSpeed = 1.0f;
     public float time = 0.0f;
 	public Vector3 EndPosition { get; set; }
 
 	public void Start()
 	{
-		print("1");
+		
 	}
 
 	public void Update ()
@@ -23,11 +23,12 @@ public class Bullet : BaseBehaviour<Bullet>
     {
 		if (EndPosition != Vector3.zero)
 		{	
-			Position = Vector3.Slerp(Position, EndPosition, Time.deltaTime * _moveSpeed);
+			Position = Vector3.Lerp(Position, EndPosition, Time.deltaTime * _moveSpeed);
 
 			if (Position == EndPosition)
 			{
 				EndPosition = Vector3.zero;
+				Destroy(gameObject);
 			}
 		}
     }

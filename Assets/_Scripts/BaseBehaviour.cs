@@ -9,6 +9,7 @@ public class BaseBehaviour<U> : MonoBehaviour where U: class
 
 	public PrefabFactory PFactory { get { return PrefabFactory.Current; } }
 	public ImageFactory IFactory { get { return ImageFactory.Current; } }
+	public Player Player { get { return Player.Current; } }
 
 	public GameObject Inst(UnityEngine.Object prefab, Vector3 position, Quaternion rotation)
 	{
@@ -24,11 +25,6 @@ public class BaseBehaviour<U> : MonoBehaviour where U: class
 	public void SetColor(Color color)
 	{
 		gameObject.renderer.material.color = color;
-	}
-
-	public void SetPosition(GameObject gameObject, Vector3 position)
-	{
-		gameObject.transform.position = position;
 	}
 
 	public Vector3 Position
@@ -53,5 +49,10 @@ public class BaseBehaviour<U> : MonoBehaviour where U: class
 		{
 			gameObject.transform.rotation = value;
 		}
+	}
+
+	public Boolean IsShipSelect()
+	{
+		return Ship.Current != null;
 	}
 }

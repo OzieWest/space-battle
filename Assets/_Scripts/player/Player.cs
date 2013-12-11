@@ -19,7 +19,7 @@ public class Player : BaseBehaviour<Player>
 
 	public PlayerAction Action { get; set; }
 	public ShipRepository ShipRepo { get; set; }
-	public GridController Grid { get { return GridController.Current; } }
+	public PlaceController PlaceController { get { return PlaceController.Current; } }
 
 	public void Start()
 	{
@@ -48,11 +48,13 @@ public class Player : BaseBehaviour<Player>
 
 		foreach (var ship in ShipRepo.GetAllShips().Where(ship => !ship.Value.active))
 		{
-			if (GUI.Button(new Rect(offset, position, widthButton, heightButton), GetImageByType(ship.Key)))
-			{
-				var freePlace = Grid.GetRandomLocation();
+			var image = IFactory.GetImageByType(ship.Key);
+			var rect = new Rect(offset, position, widthButton, heightButton);
 
-				ship.Value.SetStartPosition(freePlace);
+			if (GUI.Button(rect, image))
+			{
+				var freePlace = PlaceController.GetRandomLocation();
+				ship.Value.SetPosition(freePlace.Position);
 			}
 
 			offset += 60;
@@ -81,33 +83,8 @@ public class Player : BaseBehaviour<Player>
 		Action = PlayerAction.Wait;
 	}
 
-	public Boolean IsActionMove()
+	public Boolean Is(PlayerAction action)
 	{
-		return Action == PlayerAction.Move;
-	}
-
-	public Boolean IsActionAttack()
-	{
-		return Action == PlayerAction.Attack;
-	}
-
-	public Boolean IsActionStay()
-	{
-		return Action == PlayerAction.Stay;
-	}
-
-	private Texture2D GetImageByType(ShipType type)
-	{
-		switch (type)
-		{
-			case ShipType.Small:
-				return IFactory.SmallShipPicture;
-			case ShipType.Medium:
-				return IFactory.MediumShipPicture;
-			case ShipType.Big:
-				return IFactory.BigShipPicture;
-		}
-
-		return null;
+		return Action == action;
 	}
 }

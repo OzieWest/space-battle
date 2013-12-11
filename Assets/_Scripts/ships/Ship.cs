@@ -11,43 +11,40 @@ public class Ship : BaseBehaviour<Ship>
 	private Vector3 _endPosition;
 	private float _moveSpeed;
 	public ShipStruct Struct { get; set; }
+
 	private Boolean IsSelected { get { return Current == this; } }
+	private Boolean IsSelectable { get; set; }
 
-	public Boolean IsActionDo;
-
-	public GridController Grid { get { return GridController.Current; } }
-	public Player Player { get { return Player.Current; } }
-	public Place Place { get; set; }
+	public PlaceController PlaceController { get { return PlaceController.Current; } }
+	
+	protected Boolean IsMove { get { return Struct.Action == ShipAction.Move; } }
+	protected Boolean IsStay { get { return Struct.Action == ShipAction.Stay; } }
+	protected Boolean IsAttack { get { return Struct.Action == ShipAction.Attack; } }
 
 	public void Start()
 	{
+		IsSelectable = true;
 		_moveSpeed = 4f;
 
 		WindowGui = new Rect(5, 80, 150, 400);
 		_endPosition = Vector3.zero;
-
-		IsActionDo = false;
 	}
 
 	public void Update()
 	{
-		_moveShip();
+		Move();
 	}
 
 	public void OnMouseDown()
 	{
-		if (Struct.Action == ShipAction.Stay)
+		if (IsStay)
 		{
-			if (Current != this)
-			{
-				Grid.ResetSprites();
-			}
-
 			Current = IsSelected ? null : this;
 
 			if (!IsSelected)
 			{
 				DeselectShip();
+				PlaceController.ResetSprites();
 			}
 		}
 	}
@@ -61,62 +58,39 @@ public class Ship : BaseBehaviour<Ship>
 
 		if (IsSelected)
 		{
-			GUI.Label(new Rect(coorX, coorY, widthLabel, heightLabel), "*" + Current.Struct.Type + "Ship*");
-			GUI.Label(new Rect(coorX, coorY + 20, widthLabel, heightLabel), "Health: " + Current.Struct.Health);
-			GUI.Label(new Rect(coorX, coorY + 40, widthLabel, heightLabel), "Power: " + Current.Struct.Power);
-			GUI.Label(new Rect(coorX, coorY + 60, widthLabel, heightLabel), "Action: " + Current.Struct.Action);
+			GUI.Label(new Rect(coorX, coorY, widthLabel, heightLabel), "*" + Struct.Type + "Ship*");
+			GUI.Label(new Rect(coorX, coorY + 20, widthLabel, heightLabel), "Health: " + Struct.Health);
+			GUI.Label(new Rect(coorX, coorY + 40, widthLabel, heightLabel), "Power: " + Struct.Power);
+			GUI.Label(new Rect(coorX, coorY + 60, widthLabel, heightLabel), "Action: " + Struct.Action);
 		}
 	}
 
 	public void DeselectShip()
 	{
-		Player.SetAction(PlayerAction.Wait);
+		Player.SetAction(PlayerAction.Wait); //todo: ??
 		Current = null;
 	}
 
-	public void SetDestination(Place newPlace)
+	public void SetDestination(Vector3 destinationPosition)
 	{
-		Place.Free();
-
-		Place = newPlace;
-		Current._endPosition = Place.Position;
-
-		Place.NotFree();
-
+		_endPosition = destinationPosition;
 		DeselectShip();
 	}
 
-	public void SetStartPosition(Place place)
+	public void SetPosition(Vector3 startPosition)
 	{
-		Place = place;
-		place.IsFree = false;
-		transform.position = place.Position;
-		active = true;
+		this.gameObject.SetActive(true);
+		transform.position = startPosition;
 	}
 
-	public void Attack(Place place)
+	#region Actions
+	public void Attack(Vector3 targetPosition)
 	{
 		var bullet = Inst<Bullet>(PFactory.Bullet, Position, Quaternion.identity);
-		print("2");
-		bullet.EndPosition = place.Position;
+		bullet.EndPosition = targetPosition;
 	}
 
-	public Boolean IsShipMove()
-	{
-		return Struct.Action == ShipAction.Move;
-	}
-
-	public Boolean IsShipStay()
-	{
-		return Struct.Action == ShipAction.Stay;
-	}
-
-	public Boolean IsShipAttack()
-	{
-		return Struct.Action == ShipAction.Attack;
-	}
-
-	private void _moveShip()
+	protected void Move()
 	{
 		if (_endPosition != Vector3.zero)
 		{
@@ -127,14 +101,13 @@ public class Ship : BaseBehaviour<Ship>
 			if (Position == _endPosition)
 			{
 				_endPosition = Vector3.zero;
-				Player.ResetAction();
-
 				Struct.Action = ShipAction.Stay;
 
-				IsActionDo = true;
+				Player.ResetAction();
 			}
 		}
 	}
+	#endregion
 }
 
 public class ShipStruct
@@ -152,9 +125,9 @@ public class ShipStruct
 	{
 		Id = 0;
 
-		Type = ShipType.Unknown;
-		Action = ShipAction.Unknown;
-		State = ShipState.Unknown;
+		Type = ShipType.Small;
+		Action = ShipAction.Stay;
+		State = ShipState.Alive;
 
 		Power = 0;
 		Health = 0;
@@ -163,7 +136,6 @@ public class ShipStruct
 
 public enum ShipType
 {
-	Unknown = 0,
 	Small,
 	Medium,
 	Big
@@ -171,7 +143,6 @@ public enum ShipType
 
 public enum ShipAction
 {
-	Unknown = 0,
 	Move,
 	Stay,
 	Attack
@@ -179,7 +150,6 @@ public enum ShipAction
 
 public enum ShipState
 {
-	Unknown = 0,
 	Alive,
 	Wounded,
 	Dead

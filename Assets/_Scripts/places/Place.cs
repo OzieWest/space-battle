@@ -14,42 +14,42 @@ public class Place : BaseBehaviour<Place>
 	public Place Right { get; set; }
 
 	public Ship CurrentShip { get { return Ship.Current; } }
-	public Player Player { get { return Player.Current; } }
-	public GridController Grid { get { return GridController.Current; } }
 
 	public void Start()
 	{
 		IsFree = true;
 	}
 
+	public void OnTriggerEnter(Collider other)
+	{
+		if (other.tag == "Ship")
+		{
+			IsFree = false;
+		}
+	}
+
 	public void OnMouseDown()
 	{
-		if (GetSprite() == Grid.IconMove)
+		if (GetSprite() == IFactory.IconMove)
 		{
-			CurrentShip.SetDestination(this);
+			CurrentShip.SetDestination(this.Position);
 		}
-		else if (GetSprite() == Grid.IconAttack)
+		else if (GetSprite() == IFactory.IconAttack)
 		{
-			CurrentShip.Attack(this);
+			CurrentShip.Attack(this.Position);
 		}
 	}
 	
-	public void SetSprite(Sprite sprite, Color color)
+	public void SetSprite(Sprite sprite)
 	{
 		var spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
 		spriteRenderer.sprite = sprite;
-		spriteRenderer.color = color;
 	}
 
 	public Sprite GetSprite()
 	{
 		var spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
 		return spriteRenderer.sprite;
-	}
-
-	private Boolean _isShipSelect()
-	{
-		return CurrentShip != null;
 	}
 
 	public List<Place> GetNeighbors()
@@ -69,15 +69,5 @@ public class Place : BaseBehaviour<Place>
 			result.Add(Right);
 
 		return result;
-	}
-
-	public void Free()
-	{
-		IsFree = true;
-	}
-
-	public void NotFree()
-	{
-		IsFree = false;
 	}
 }
