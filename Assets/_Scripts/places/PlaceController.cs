@@ -49,26 +49,30 @@ public class PlaceController : BaseBehaviour<PlaceController>
 	{
 		if (IsShipSelect())
 		{
+			foreach (var place in this)
+			{
+				if (place.GetSprite() != IFactory.IconAttack && place.IsFree)
+				{
+					place.SetSprite(IFactory.IconAttack);
+				}
+			}
+
 			var movementPlaces = CurrentShip.Location.GetNeighbors().Where(x => x.IsFree);
 			foreach (var movementPlace in movementPlaces)
 			{
 				movementPlace.SetSprite(IFactory.IconMove);
-			}
-
-			foreach (var place in this)
-			{
-				if (place.GetSprite() != IFactory.IconMove && 
-					place.GetSprite() != IFactory.IconAttack && 
-					place.IsFree)
-				{
-					place.SetSprite(IFactory.IconAttack);
-				}
 			}
 		}
 		else
 		{
 			ResetSprites();
 		}
+	}
+
+	public Vector3 GetCoordinateLastRow()
+	{
+		var place = _places[gridX - 1][0];
+		return place.Position;
 	}
 
 	public void ResetSprites()

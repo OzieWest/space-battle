@@ -63,23 +63,27 @@ public class Ship : BaseBehaviour<Ship>
 
 	public void OnGUI()
 	{
-		var coorX = 120;
-		var coorY = Screen.height - 100;
-		var widthLabel = 150;
-		var heightLabel = 20;
-
 		if (IsSelected)
 		{
-			GUI.Label(new Rect(coorX, coorY, widthLabel, heightLabel), "*" + Struct.Type + "Ship*");
-			GUI.Label(new Rect(coorX, coorY + 20, widthLabel, heightLabel), "Health: " + Struct.Health);
-			GUI.Label(new Rect(coorX + 60, coorY + 20, widthLabel, heightLabel), "Power: " + Struct.Power);
-			GUI.Label(new Rect(coorX, coorY + 40, widthLabel, heightLabel), "Action: " + Struct.Action);
+			var coor = PlaceController.GetCoordinateLastRow();
+			coor.y *= -1;
+			
+			var screenCoor = Camera.main.WorldToScreenPoint(coor);
+			screenCoor.x -= 20;
+			screenCoor.y += 25;
+
+			var widthLabel = 150;
+			var heightLabel = 20;
+
+			GUI.Label(new Rect(screenCoor.x, screenCoor.y, widthLabel, heightLabel), "*" + Struct.Type + "Ship*");
+			GUI.Label(new Rect(screenCoor.x, screenCoor.y + 20, widthLabel, heightLabel), "Health: " + Struct.Health);
+			GUI.Label(new Rect(screenCoor.x + 60, screenCoor.y + 20, widthLabel, heightLabel), "Power: " + Struct.Power);
+			GUI.Label(new Rect(screenCoor.x, screenCoor.y + 40, widthLabel, heightLabel), "Action: " + Struct.Action);
 		}
 	}
 
 	public void Deselect()
 	{
-		IsSelectable = false;
 		Current = null;
 	}
 
@@ -114,6 +118,7 @@ public class Ship : BaseBehaviour<Ship>
 			bullet.EndPosition = _targetPosition;
 
 			_targetPosition = Vector3.zero;
+			IsSelectable = false;
 			Deselect();
 		}
 	}
@@ -133,6 +138,7 @@ public class Ship : BaseBehaviour<Ship>
 
 			if (Position == _endPosition)
 			{
+				IsSelectable = false;
 				_endPosition = Vector3.zero;
 				Struct.Action = ShipAction.Stay;
 				Player.ResetAction();
