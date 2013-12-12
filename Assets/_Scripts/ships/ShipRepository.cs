@@ -39,8 +39,6 @@ public class ShipRepository
 
 	private Ship _configurateShip(GameObject prefab, ShipType type)
 	{
-		prefab.active = false;
-
 		var shipStruct = new ShipStruct()
 		{
 			Health = GetHealthByType(type),

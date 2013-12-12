@@ -9,11 +9,10 @@ using Random = UnityEngine.Random;
 public class PlaceController : BaseBehaviour<PlaceController>
 {
 	#region Coor
-	private int gridX = 10;
-	private int gridY = 8;
-
-	private float placeScale = 1;
-	private float offset = 1;
+	private int gridX			= 10;
+	private int gridY			= 8;
+	private float placeScale	= 1;
+	private float offset		= 1;
 	#endregion
 
 	private List<List<Place>> _places;
@@ -31,17 +30,33 @@ public class PlaceController : BaseBehaviour<PlaceController>
 		_configuratePlace();
 	}
 
+	public void OnGUI()
+	{
+		var count = 0;
+
+		foreach (var place in this)
+		{
+			if (!place.IsFree)
+				count++;
+		}
+
+		GUI.Label(new Rect(0, 0, 200, 50), count.ToString());
+
+		count = 0;
+	}
+
 	public void Update()
 	{
 		if (IsShipSelect())
 		{
+			var movementPlaces = CurrentShip.Location.GetNeighbors().Where(x => x.IsFree);
+			foreach (var movementPlace in movementPlaces)
+			{
+				movementPlace.SetSprite(IFactory.IconMove);
+			}
+
 			foreach (var place in this)
 			{
-				if (!place.IsFree)
-				{
-					//todo
-				}
-
 				if (place.GetSprite() != IFactory.IconMove && 
 					place.GetSprite() != IFactory.IconAttack && 
 					place.IsFree)

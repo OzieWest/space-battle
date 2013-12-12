@@ -21,15 +21,22 @@ public class Player : BaseBehaviour<Player>
 	public ShipRepository ShipRepo { get; set; }
 	public PlaceController PlaceController { get { return PlaceController.Current; } }
 
+	private Boolean fleatCreated = false;
+
 	public void Start()
 	{
 		Current = this;
 		ShipRepo = new ShipRepository(this);
 
 		Action = PlayerAction.Wait;
-
-		CreateFleat();
 	}
+
+	public void Update()
+	{
+		if (!fleatCreated)
+			CreateFleat();
+	}
+
 
 	public void OnGUI()
 	{
@@ -45,20 +52,6 @@ public class Player : BaseBehaviour<Player>
 		//GUI.Label(new Rect(offset, 25, widthLabel, heightLabel), "Score: " + Score);
 		//GUI.Label(new Rect(offset, 45, widthLabel, heightLabel), "Action: " + Action);
 		//GUI.Label(new Rect(offset, 65, widthLabel, heightLabel), "ShipCount: " + ShipCount);
-
-		foreach (var ship in ShipRepo.GetAllShips().Where(ship => !ship.Value.active))
-		{
-			var image = IFactory.GetImageByType(ship.Key);
-			var rect = new Rect(offset, position, widthButton, heightButton);
-
-			if (GUI.Button(rect, image))
-			{
-				var freePlace = PlaceController.GetRandomLocation();
-				ship.Value.SetPosition(freePlace.Position);
-			}
-
-			offset += 60;
-		}
 	}
 
 	public void CreateFleat()
@@ -66,11 +59,18 @@ public class Player : BaseBehaviour<Player>
 		var types = new List<ShipType>
 		{
 			ShipType.Small,
-			ShipType.Medium
+			ShipType.Medium,
+			ShipType.Big
 		};
 
 		foreach (var type in types)
-			ShipRepo.CreateShip(type, Vector3.zero);
+		{
+			var freePlace = PlaceController.GetRandomLocation();
+			freePlace.Close();
+			ShipRepo.CreateShip(type, freePlace.Position);
+		}
+
+		fleatCreated = true;
 	}
 
 	public void SetAction(PlayerAction action)

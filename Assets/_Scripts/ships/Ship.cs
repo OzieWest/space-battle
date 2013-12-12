@@ -8,6 +8,7 @@ public class Ship : BaseBehaviour<Ship>
 {
 	public Rect WindowGui { get; set; }
 
+	private Vector3 _targetPosition;
 	private Vector3 _endPosition;
 	private float _moveSpeed;
 	public ShipStruct Struct { get; set; }
@@ -16,7 +17,8 @@ public class Ship : BaseBehaviour<Ship>
 	private Boolean IsSelectable { get; set; }
 
 	public PlaceController PlaceController { get { return PlaceController.Current; } }
-	
+	public Place Location { get; set; }
+
 	protected Boolean IsMove { get { return Struct.Action == ShipAction.Move; } }
 	protected Boolean IsStay { get { return Struct.Action == ShipAction.Stay; } }
 	protected Boolean IsAttack { get { return Struct.Action == ShipAction.Attack; } }
@@ -30,20 +32,30 @@ public class Ship : BaseBehaviour<Ship>
 		_endPosition = Vector3.zero;
 	}
 
-	public void Update()
+	public void Update() //loop
 	{
 		Move();
+		Attack();
 	}
 
-	public void OnMouseDown()
+	public void OnTriggerEnter(Collider other) // oneTime
 	{
-		if (IsStay)
+		if (other.tag == "Place")
+		{
+			print("ship: OnTriggerEnter");
+			SetLocation(other.gameObject);
+		}
+	}
+
+	public void OnMouseDown() //loop
+	{
+		if (IsStay && IsSelectable)
 		{
 			Current = IsSelected ? null : this;
 
 			if (!IsSelected)
 			{
-				DeselectShip();
+				Deselect();
 				PlaceController.ResetSprites();
 			}
 		}
@@ -60,21 +72,31 @@ public class Ship : BaseBehaviour<Ship>
 		{
 			GUI.Label(new Rect(coorX, coorY, widthLabel, heightLabel), "*" + Struct.Type + "Ship*");
 			GUI.Label(new Rect(coorX, coorY + 20, widthLabel, heightLabel), "Health: " + Struct.Health);
-			GUI.Label(new Rect(coorX, coorY + 40, widthLabel, heightLabel), "Power: " + Struct.Power);
-			GUI.Label(new Rect(coorX, coorY + 60, widthLabel, heightLabel), "Action: " + Struct.Action);
+			GUI.Label(new Rect(coorX + 60, coorY + 20, widthLabel, heightLabel), "Power: " + Struct.Power);
+			GUI.Label(new Rect(coorX, coorY + 40, widthLabel, heightLabel), "Action: " + Struct.Action);
 		}
 	}
 
-	public void DeselectShip()
+	public void Deselect()
 	{
-		Player.SetAction(PlayerAction.Wait); //todo: ??
+		IsSelectable = false;
 		Current = null;
+	}
+
+	public void SetLocation(GameObject placeObject)
+	{
+		Location = placeObject.GetComponent<Place>();
+		Location.Close();
+	}
+
+	public void SetTarget(Vector3 targetPosition)
+	{
+		_targetPosition = targetPosition;
 	}
 
 	public void SetDestination(Vector3 destinationPosition)
 	{
 		_endPosition = destinationPosition;
-		DeselectShip();
 	}
 
 	public void SetPosition(Vector3 startPosition)
@@ -84,17 +106,28 @@ public class Ship : BaseBehaviour<Ship>
 	}
 
 	#region Actions
-	public void Attack(Vector3 targetPosition)
+	protected void Attack()
 	{
-		var bullet = Inst<Bullet>(PFactory.Bullet, Position, Quaternion.identity);
-		bullet.EndPosition = targetPosition;
+		if (_targetPosition != Vector3.zero)
+		{
+			var bullet = Inst<Bullet>(PFactory.Bullet, Position, Quaternion.identity);
+			bullet.EndPosition = _targetPosition;
+
+			_targetPosition = Vector3.zero;
+			Deselect();
+		}
 	}
 
 	protected void Move()
 	{
 		if (_endPosition != Vector3.zero)
 		{
-			Struct.Action = ShipAction.Move;
+			if (!IsMove)
+			{
+				Location.Open();
+				Deselect();
+				Struct.Action = ShipAction.Move;
+			}
 
 			Position = Vector3.Lerp(Position, _endPosition, Time.deltaTime * _moveSpeed);
 
@@ -102,10 +135,14 @@ public class Ship : BaseBehaviour<Ship>
 			{
 				_endPosition = Vector3.zero;
 				Struct.Action = ShipAction.Stay;
-
 				Player.ResetAction();
 			}
 		}
+	}
+
+	protected void Rotate()
+	{
+		
 	}
 	#endregion
 }

@@ -20,14 +20,6 @@ public class Place : BaseBehaviour<Place>
 		IsFree = true;
 	}
 
-	public void OnTriggerEnter(Collider other)
-	{
-		if (other.tag == "Ship")
-		{
-			IsFree = false;
-		}
-	}
-
 	public void OnMouseDown()
 	{
 		if (GetSprite() == IFactory.IconMove)
@@ -36,7 +28,7 @@ public class Place : BaseBehaviour<Place>
 		}
 		else if (GetSprite() == IFactory.IconAttack)
 		{
-			CurrentShip.Attack(this.Position);
+			CurrentShip.SetTarget(this.Position);
 		}
 	}
 	
@@ -69,5 +61,15 @@ public class Place : BaseBehaviour<Place>
 			result.Add(Right);
 
 		return result;
+	}
+
+	public void Open()
+	{
+		IsFree = true;
+	}
+
+	public void Close()
+	{
+		IsFree = false;
 	}
 }
