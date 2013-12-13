@@ -9,8 +9,8 @@ using Random = UnityEngine.Random;
 public class PlaceController : BaseBehaviour<PlaceController>
 {
 	#region Coor
-	private int gridX			= 10;
-	private int gridY			= 8;
+	private int columns			= 6;
+	private int rows			= 10;
 	private float placeScale	= 1;
 	private float offset		= 1;
 	#endregion
@@ -71,7 +71,7 @@ public class PlaceController : BaseBehaviour<PlaceController>
 
 	public Vector3 GetCoordinateLastRow()
 	{
-		var place = _places[gridX - 1][0];
+		var place = _places[rows - 1][0];
 		return place.Position;
 	}
 
@@ -125,7 +125,7 @@ public class PlaceController : BaseBehaviour<PlaceController>
 	public Place GetRandomLocation()
 	{
 		var firstInt = Random.Range(7, 10);
-		var secondInt = Random.Range(0, 8);
+		var secondInt = Random.Range(0, 6);
 
 		var place = _places[firstInt][secondInt];
 
@@ -140,11 +140,11 @@ public class PlaceController : BaseBehaviour<PlaceController>
 		var startVector = Camera.main.ScreenToWorldPoint(new Vector3(50, Screen.height - 50, 20));
 		var startX = startVector.x;
 
-		for (var i = 0; i < gridX; i++)
+		for (var i = 0; i < rows; i++)
 		{
 			var innerList = new List<Place>();
 
-			for (var j = 0; j < gridY; j++)
+			for (var j = 0; j < columns; j++)
 			{
 				innerList.Add(
 					_createPlace(startVector)

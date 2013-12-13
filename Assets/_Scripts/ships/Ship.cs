@@ -114,7 +114,9 @@ public class Ship : BaseBehaviour<Ship>
 	{
 		if (_targetPosition != Vector3.zero)
 		{
-			var bullet = Inst<Bullet>(PFactory.Bullet, Position, Quaternion.identity);
+			var startPosition = Position;
+
+			var bullet = Inst<Bullet>(PFactory.Bullet, startPosition, Quaternion.identity);
 			bullet.EndPosition = _targetPosition;
 
 			_targetPosition = Vector3.zero;
