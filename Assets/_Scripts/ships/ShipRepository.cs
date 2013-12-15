@@ -31,18 +31,13 @@ public class ShipRepository : BaseBehaviour<ShipRepository>
 
 	private Ship ConfigurateShip(GameObject prefab, ShipType type)
 	{
-		var shipStruct = new ShipStruct()
-		{
-			Health = GetHealthByType(type),
-			Power = GetPowerByType(type),
-			Action = GetDefaultAction(),
-			State = GetDefaultState(),
-			Type = type
-		};
-
 		var shipPrefab = prefab.GetComponent<Ship>();
-		shipPrefab.Struct = shipStruct;
-
+		shipPrefab.Health = GetHealthByType(type);
+		shipPrefab.Power = GetPowerByType(type);
+		shipPrefab.Action = GetDefaultAction();
+		shipPrefab.State = GetDefaultState();
+		shipPrefab.Type = type;
+		
 		return shipPrefab;
 	}
 

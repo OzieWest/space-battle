@@ -4,32 +4,16 @@ using System.Runtime.InteropServices;
 using UnityEngine;
 using System.Collections;
 
-public class Ship : BaseBehaviour<Ship>
+public class Ship : BaseShip<Ship>
 {
-	public Rect WindowGui { get; set; }
-
-	private Vector3 _targetPosition;
-	private Vector3 _endPosition;
-	private float _moveSpeed;
-	public ShipStruct Struct { get; set; }
-
 	private Boolean IsSelected { get { return Current == this; } }
-	private Boolean IsSelectable { get; set; }
 
 	public PlaceController PlaceController { get { return PlaceController.Current; } }
 	public Place Location { get; set; }
 
-	protected Boolean IsMove { get { return Struct.Action == ShipAction.Move; } }
-	protected Boolean IsStay { get { return Struct.Action == ShipAction.Stay; } }
-	protected Boolean IsAttack { get { return Struct.Action == ShipAction.Attack; } }
-
 	public void Start()
 	{
-		IsSelectable = true;
-		_moveSpeed = 4f;
-
-		WindowGui = new Rect(5, 80, 150, 400);
-		_endPosition = Vector3.zero;
+		
 	}
 
 	public void Update() //loop
@@ -61,7 +45,7 @@ public class Ship : BaseBehaviour<Ship>
 		}
 	}
 
-	public void OnGUI()
+	public void OnGUI() //loop
 	{
 		if (IsSelected)
 		{
@@ -75,10 +59,10 @@ public class Ship : BaseBehaviour<Ship>
 			var widthLabel = 150;
 			var heightLabel = 20;
 
-			GUI.Label(new Rect(screenCoor.x, screenCoor.y, widthLabel, heightLabel), "*" + Struct.Type + "Ship*");
-			GUI.Label(new Rect(screenCoor.x, screenCoor.y + 20, widthLabel, heightLabel), "Health: " + Struct.Health);
-			GUI.Label(new Rect(screenCoor.x + 60, screenCoor.y + 20, widthLabel, heightLabel), "Power: " + Struct.Power);
-			GUI.Label(new Rect(screenCoor.x, screenCoor.y + 40, widthLabel, heightLabel), "Action: " + Struct.Action);
+			GUI.Label(new Rect(screenCoor.x, screenCoor.y, widthLabel, heightLabel), "*" + Type + "Ship*");
+			GUI.Label(new Rect(screenCoor.x, screenCoor.y + 20, widthLabel, heightLabel), "Health: " + Health);
+			GUI.Label(new Rect(screenCoor.x + 60, screenCoor.y + 20, widthLabel, heightLabel), "Power: " + Power);
+			GUI.Label(new Rect(screenCoor.x, screenCoor.y + 40, widthLabel, heightLabel), "Action: " + Action);
 		}
 	}
 
@@ -133,7 +117,7 @@ public class Ship : BaseBehaviour<Ship>
 			{
 				Location.Open();
 				Deselect();
-				Struct.Action = ShipAction.Move;
+				Action = ShipAction.Move;
 			}
 
 			Position = Vector3.Lerp(Position, _endPosition, Time.deltaTime * _moveSpeed);
@@ -142,7 +126,7 @@ public class Ship : BaseBehaviour<Ship>
 			{
 				IsSelectable = false;
 				_endPosition = Vector3.zero;
-				Struct.Action = ShipAction.Stay;
+				Action = ShipAction.Stay;
 				Player.ResetAction();
 			}
 		}
@@ -153,30 +137,6 @@ public class Ship : BaseBehaviour<Ship>
 		
 	}
 	#endregion
-}
-
-public class ShipStruct
-{
-	public int Id { get; set; }
-
-	public ShipType Type { get; set; }
-	public ShipAction Action { get; set; }
-	public ShipState State { get; set; }
-
-	public int Health;
-	public int Power { get; set; }
-
-	public void Start()
-	{
-		Id = 0;
-
-		Type = ShipType.Small;
-		Action = ShipAction.Stay;
-		State = ShipState.Alive;
-
-		Power = 0;
-		Health = 0;
-	}
 }
 
 public enum ShipType
