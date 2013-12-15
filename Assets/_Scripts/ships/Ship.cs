@@ -56,7 +56,7 @@ public class Ship : BaseBehaviour<Ship>
 			if (!IsSelected)
 			{
 				Deselect();
-				PlaceController.ResetSprites();
+				PlaceController.SetDefaultSprites();
 			}
 		}
 	}

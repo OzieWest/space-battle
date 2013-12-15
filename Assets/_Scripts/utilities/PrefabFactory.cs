@@ -11,6 +11,10 @@ public class PrefabFactory : BaseBehaviour<PrefabFactory>
 	
 	public GameObject Place;
 
+	public GameObject enemySmallShip;
+	public GameObject enemyMiddleShip;
+	public GameObject enemyBigShip;
+
 	public void Start()
 	{
 		Current = this;

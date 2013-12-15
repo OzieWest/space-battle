@@ -9,40 +9,34 @@ using Random = UnityEngine.Random;
 public class PlaceController : BaseBehaviour<PlaceController>
 {
 	#region Coor
-	private int columns			= 6;
-	private int rows			= 10;
-	private float placeScale	= 1;
-	private float offset		= 1;
+	protected const int Columns = 6;
+	protected const int Rows = 10;
+	protected const float PlaceScale = 1;
+	protected const float Offset = 1;
 	#endregion
 
-	private List<List<Place>> _places;
+	protected List<List<Place>> Places;
 
 	public Ship CurrentShip { get { return Ship.Current; } }
 
+	public PlaceController() { Current = this; Places = new List<List<Place>>(); } // конструктор
+
 	public void Start()
 	{
-		Current = this;
+		CreateGrid();
 
-		_places = new List<List<Place>>();
-
-		_createGrid();
-
-		_configuratePlace();
+		ConfiguratePlace();
 	}
 
 	public void OnGUI()
 	{
 		var count = 0;
-
 		foreach (var place in this)
 		{
 			if (!place.IsFree)
 				count++;
 		}
-
 		GUI.Label(new Rect(0, 0, 200, 50), count.ToString());
-
-		count = 0;
 	}
 
 	public void Update()
@@ -65,17 +59,17 @@ public class PlaceController : BaseBehaviour<PlaceController>
 		}
 		else
 		{
-			ResetSprites();
+			SetDefaultSprites();
 		}
 	}
 
 	public Vector3 GetCoordinateLastRow()
 	{
-		var place = _places[rows - 1][0];
+		var place = Places[Rows - 1][0];
 		return place.Position;
 	}
 
-	public void ResetSprites()
+	public void SetDefaultSprites()
 	{
 		foreach (var place in this)
 		{
@@ -86,81 +80,49 @@ public class PlaceController : BaseBehaviour<PlaceController>
 		}
 	}
 
-	private void _configuratePlace()
-	{
-		for (var i = 0; i < _places.Count; i++)
-		{
-			for (var j = 0; j < _places[i].Count; j++)
-			{
-				var place = _places[i][j];
-
-				if (i != 0)
-				{
-					place.Left = _places[i - 1][j];
-				}
-
-				if (i < _places.Count - 1)
-				{
-					place.Right = _places[i + 1][j];
-				}
-
-				if (j != 0)
-				{
-					place.Top = _places[i][j - 1];
-				}
-
-				if (j < _places[i].Count - 1)
-				{
-					place.Bottom = _places[i][j + 1];
-				}
-			}
-		}
-	}
-
 	public IEnumerator<Place> GetEnumerator()
 	{
-		return _places.SelectMany(placeList => placeList).GetEnumerator();
+		return Places.SelectMany(placeList => placeList).GetEnumerator();
 	}
 
-	public Place GetRandomLocation()
-	{
-		var firstInt = Random.Range(7, 10);
-		var secondInt = Random.Range(0, 6);
-
-		var place = _places[firstInt][secondInt];
-
-		if (!place.IsFree)
-			place = GetRandomLocation();
-
-		return place;
-	}
-
-	private void _createGrid()
+	protected void CreateGrid()
 	{
 		var startVector = Camera.main.ScreenToWorldPoint(new Vector3(50, Screen.height - 50, 20));
 		var startX = startVector.x;
 
-		for (var i = 0; i < rows; i++)
+		for (var i = 0; i < Rows; i++)
 		{
 			var innerList = new List<Place>();
 
-			for (var j = 0; j < columns; j++)
+			for (var j = 0; j < Columns; j++)
 			{
-				innerList.Add(
-					_createPlace(startVector)
-				);
+				var newPlace = CreatePlace(startVector);
+				innerList.Add(newPlace);
 
-				startVector.x += placeScale + offset;
+				startVector.x += PlaceScale + Offset;
 			}
 			
-			_places.Add(innerList);
+			Places.Add(innerList);
 
 			startVector.x = startX;
-			startVector.y -= placeScale + offset;
+			startVector.y -= PlaceScale + Offset;
 		}
 	}
 
-	private Place _createPlace(Vector3 position)
+	public Place GetRandomPlace()
+	{
+		var firstInt = Random.Range(7, 10);
+		var secondInt = Random.Range(0, 6);
+
+		var place = Places[firstInt][secondInt];
+
+		if (!place.IsFree)
+			place = GetRandomPlace();
+
+		return place;
+	}
+
+	protected Place CreatePlace(Vector3 position)
 	{
 		var result = Inst(PrefabFactory.Current.Place, position, transform.rotation);
 
@@ -168,5 +130,36 @@ public class PlaceController : BaseBehaviour<PlaceController>
 		place.SetSprite(IFactory.IconDefault);
 
 		return place;
+	}
+
+	protected void ConfiguratePlace()
+	{
+		for (var i = 0; i < Places.Count; i++)
+		{
+			for (var j = 0; j < Places[i].Count; j++)
+			{
+				var place = Places[i][j];
+
+				if (i != 0)
+				{
+					place.Left = Places[i - 1][j];
+				}
+
+				if (i < Places.Count - 1)
+				{
+					place.Right = Places[i + 1][j];
+				}
+
+				if (j != 0)
+				{
+					place.Top = Places[i][j - 1];
+				}
+
+				if (j < Places[i].Count - 1)
+				{
+					place.Bottom = Places[i][j + 1];
+				}
+			}
+		}
 	}
 }

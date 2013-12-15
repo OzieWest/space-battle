@@ -45,7 +45,7 @@ SubShader {
         float4 pos = mul(UNITY_MATRIX_MVP, vertexData.vertex);
         float4 posWorld = mul(_Object2World, vertexData.vertex);
         outData.uv_MainTex = vertexData.texcoord;
-        outData.location = posWorld.xz;
+        outData.location = posWorld.xy;
     }
  
     void surf (Input IN, inout SurfaceOutput o) {
@@ -59,7 +59,7 @@ SubShader {
  
     //return 0 if (pos - nearVertex) > _FogRadius
     float powerForPos(float4 pos, float2 nearVertex) {
-        float atten = clamp(_FogRadius - length(pos.xz - nearVertex.xy), 0.0, _FogRadius);
+        float atten = clamp(_FogRadius - length(pos.xy - nearVertex.xy), 0.0, _FogRadius);
  
         return (1.0/_FogMaxRadius)*atten/_FogRadius;
     }

@@ -4,28 +4,20 @@ using System.Linq;
 using UnityEngine;
 using System.Collections;
 
-public class ShipRepository
+public class ShipRepository : BaseBehaviour<ShipRepository>
 {
 	private Dictionary<ShipType, Ship> _ships;
-	private Player _player;
 
-	public ShipRepository(Player player)
+	public ShipRepository()
 	{
 		_ships = new Dictionary<ShipType, Ship>();
-		_player = player;
 	}
 
 	public Ship CreateShip(ShipType type, Vector3 position)
 	{
-		var prefab = GetPrefabByType(type);
-
-		var result = _player.Inst(
-			prefab,
-			position,
-			prefab.transform.rotation
-		);
-
-		var ship = _configurateShip(result, type);
+		var prefab = GetPrefabByType(type); // получаем чистый префаб
+		var result = Inst(prefab, position, prefab.transform.rotation ); // настраиваем префаб
+		var ship = ConfigurateShip(result, type); // настраиваем поведение
 
 		_ships.Add(type, ship);
 
@@ -37,14 +29,14 @@ public class ShipRepository
 		return _ships;
 	}
 
-	private Ship _configurateShip(GameObject prefab, ShipType type)
+	private Ship ConfigurateShip(GameObject prefab, ShipType type)
 	{
 		var shipStruct = new ShipStruct()
 		{
 			Health = GetHealthByType(type),
 			Power = GetPowerByType(type),
-			Action = DefaultAction(),
-			State = DefaultState(),
+			Action = GetDefaultAction(),
+			State = GetDefaultState(),
 			Type = type
 		};
 
@@ -54,7 +46,7 @@ public class ShipRepository
 		return shipPrefab;
 	}
 
-	private GameObject GetPrefabByType(ShipType type)
+	public static GameObject GetPrefabByType(ShipType type)
 	{
 		GameObject result = null;
 
@@ -75,19 +67,19 @@ public class ShipRepository
 	}
 
 	//Действие корабля по умолчанию
-	private ShipAction DefaultAction()
+	public static ShipAction GetDefaultAction()
 	{
 		return ShipAction.Stay;
 	}
 
 	//Состояние корабля по умолчанию
-	private ShipState DefaultState()
+	public static ShipState GetDefaultState()
 	{
 		return ShipState.Alive;
 	}
 
 	//Возвращает количество "Здоровья" в зависимости от типа корабля
-	private int GetHealthByType(ShipType type)
+	public static int GetHealthByType(ShipType type)
 	{
 		var result = 0;
 
@@ -108,7 +100,7 @@ public class ShipRepository
 	}
 
 	//Возвращает количество "Силы" в зависимости от типа корабля
-	private int GetPowerByType(ShipType type)
+	public static int GetPowerByType(ShipType type)
 	{
 		var result = 0;
 
