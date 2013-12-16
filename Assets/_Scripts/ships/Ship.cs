@@ -26,7 +26,6 @@ public class Ship : BaseShip<Ship>
 	{
 		if (other.tag == "Place")
 		{
-			print("ship: OnTriggerEnter");
 			SetLocation(other.gameObject);
 		}
 	}
@@ -98,13 +97,12 @@ public class Ship : BaseShip<Ship>
 	{
 		if (_targetPosition != Vector3.zero)
 		{
-			var startPosition = Position;
-
-			var bullet = Inst<Bullet>(PFactory.Bullet, startPosition, Quaternion.identity);
-			bullet.EndPosition = _targetPosition;
+			var bullet = Inst<Bullet>(PFactory.Bullet, this.Position, Quaternion.identity);
+			bullet.SendTo(_targetPosition);
 
 			_targetPosition = Vector3.zero;
 			IsSelectable = false;
+
 			Deselect();
 		}
 	}

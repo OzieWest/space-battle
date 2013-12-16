@@ -1,44 +1,51 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
 using UnityEngine;
 using System.Collections;
 
+public enum eBulletState
+{
+	Move,
+	Explode
+}
+
+public class BulletFSM : FiniteStateMachine<eBulletState> { };
+
 public class Bullet : BaseBehaviour<Bullet>
 {
-	private float _moveSpeed = 2f;
-	private float time = 0.0f;
+	protected BulletFSM fsm;
+
 	public Vector3 EndPosition { get; set; }
 
-	public void Start()
+	protected void Start()
 	{
-		
+		fsm = new BulletFSM();
+
+		fsm.AddTransition(eBulletState.Move, eBulletState.Move, Move);
+		fsm.AddTransition(eBulletState.Move, eBulletState.Explode, Explode);
 	}
 
-	public void Update ()
+	protected void Update()
 	{
-	    Movement();
-	    //LiveCycle();
+		if (EndPosition == Vector3.zero)
+			fsm.Advance(eBulletState.Explode);
+		else
+			fsm.Advance(eBulletState.Move);
 	}
 
-    public void Movement()
-    {
-		if (EndPosition != Vector3.zero)
-		{
-			Position = Vector3.Slerp(Position, EndPosition, Time.deltaTime * _moveSpeed);
+	public void SendTo(Vector3 position)
+	{
+		EndPosition = position;
+	}
 
-			if (Position == EndPosition)
-			{
-				EndPosition = Vector3.zero;
-				Destroy(gameObject);
-			}
-		}
-    }
+	protected void Move()
+	{
+		float _moveSpeed = 2f;
+		Position = Vector3.Slerp(Position, EndPosition, Time.deltaTime * _moveSpeed);
+	}
 
-    public void LiveCycle()
-    {
-        time += Time.deltaTime;
-        if (time > 2)
-        {
-            Destroy(gameObject);
-        }
-    }
+	protected void Explode()
+	{
+		Destroy(gameObject);
+	}
 }
