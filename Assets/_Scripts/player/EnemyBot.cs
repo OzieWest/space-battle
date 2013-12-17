@@ -15,16 +15,16 @@ public class EnemyBot : BasePlayer<EnemyBot>
 	{
 		if (!_fleatCreated)
 		{
-			var types = new List<ShipType>
+			var types = new List<eShipType>
 			{
-				ShipType.Small
+				eShipType.Small
 			};
 
 			this.CreateFleat(types);
 		}
 	}
 
-	protected override void CreateFleat(List<ShipType> types)
+	protected override void CreateFleat(List<eShipType> types)
 	{
 		foreach (var type in types)
 		{

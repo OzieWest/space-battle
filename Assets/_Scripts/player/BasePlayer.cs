@@ -22,7 +22,7 @@ public abstract class BasePlayer<U> : BaseBehaviour<U> where U : class
 		_fleatCreated = false;
 	}
 
-	protected abstract void CreateFleat(List<ShipType> types);
+	protected abstract void CreateFleat(List<eShipType> types);
 
 	public void SetAction(PlayerAction action)
 	{

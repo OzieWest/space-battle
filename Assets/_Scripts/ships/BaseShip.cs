@@ -2,12 +2,27 @@
 using System.Collections;
 using System;
 
+public enum eShipType
+{
+	Small,
+	Medium,
+	Big
+}
+
+public enum eShipState
+{
+	Stay,
+	Selected,
+	Move,
+	Attack,
+	Explode
+}
+
 public class BaseShip<U> : BaseBehaviour<U> where U: class
 {
 	#region Struct
-	public ShipType Type { get; set; }
-	public ShipAction Action { get; set; }
-	public ShipState State { get; set; }
+	public eShipType Type { get; set; }
+	public eShipState CurrentState { get; set; }
 	public int Health { get; set; }
 	public int Power { get; set; }
 	#endregion
@@ -15,10 +30,6 @@ public class BaseShip<U> : BaseBehaviour<U> where U: class
 	protected Vector3 _targetPosition;
 	protected Vector3 _endPosition;
 	protected float _moveSpeed;
-
-	protected Boolean IsMove { get { return Action == ShipAction.Move; } }
-	protected Boolean IsStay { get { return Action == ShipAction.Stay; } }
-	protected Boolean IsAttack { get { return Action == ShipAction.Attack; } }
 
 	protected Boolean IsSelectable { get; set; }
 

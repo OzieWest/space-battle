@@ -13,6 +13,7 @@ public class BulletFSM : FiniteStateMachine<eBulletState> { };
 
 public class Bullet : BaseBehaviour<Bullet>
 {
+	float _moveSpeed = 2f;
 	protected BulletFSM fsm;
 
 	public Vector3 EndPosition { get; set; }
@@ -40,7 +41,6 @@ public class Bullet : BaseBehaviour<Bullet>
 
 	protected void Move()
 	{
-		float _moveSpeed = 2f;
 		Position = Vector3.Slerp(Position, EndPosition, Time.deltaTime * _moveSpeed);
 	}
 

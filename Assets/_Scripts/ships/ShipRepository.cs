@@ -6,14 +6,14 @@ using System.Collections;
 
 public class ShipRepository : BaseBehaviour<ShipRepository>
 {
-	private Dictionary<ShipType, Ship> _ships;
+	private Dictionary<eShipType, Ship> _ships;
 
 	public ShipRepository()
 	{
-		_ships = new Dictionary<ShipType, Ship>();
+		_ships = new Dictionary<eShipType, Ship>();
 	}
 
-	public Ship CreateShip(ShipType type, Vector3 position)
+	public Ship CreateShip(eShipType type, Vector3 position)
 	{
 		var prefab = GetPrefabByType(type); // получаем чистый префаб
 		var result = Inst(prefab, position, prefab.transform.rotation ); // настраиваем префаб
@@ -24,36 +24,35 @@ public class ShipRepository : BaseBehaviour<ShipRepository>
 		return ship;
 	}
 
-	public Dictionary<ShipType, Ship> GetAllShips()
+	public Dictionary<eShipType, Ship> GetAllShips()
 	{
 		return _ships;
 	}
 
-	private Ship ConfigurateShip(GameObject prefab, ShipType type)
+	private Ship ConfigurateShip(GameObject prefab, eShipType type)
 	{
 		var shipPrefab = prefab.GetComponent<Ship>();
 		shipPrefab.Health = GetHealthByType(type);
 		shipPrefab.Power = GetPowerByType(type);
-		shipPrefab.Action = GetDefaultAction();
-		shipPrefab.State = GetDefaultState();
+		shipPrefab.CurrentState = GetDefaultAction();
 		shipPrefab.Type = type;
 		
 		return shipPrefab;
 	}
 
-	public static GameObject GetPrefabByType(ShipType type)
+	public static GameObject GetPrefabByType(eShipType type)
 	{
 		GameObject result = null;
 
 		switch (type)
 		{
-			case ShipType.Small:
+			case eShipType.Small:
 				result = PrefabFactory.Current.SmallShip;
 				break;
-			case ShipType.Medium:
+			case eShipType.Medium:
 				result = PrefabFactory.Current.MiddleShip;
 				break;
-			case ShipType.Big:
+			case eShipType.Big:
 				result = PrefabFactory.Current.BigShip;
 				break;
 		}
@@ -62,31 +61,25 @@ public class ShipRepository : BaseBehaviour<ShipRepository>
 	}
 
 	//Действие корабля по умолчанию
-	public static ShipAction GetDefaultAction()
+	public static eShipState GetDefaultAction()
 	{
-		return ShipAction.Stay;
-	}
-
-	//Состояние корабля по умолчанию
-	public static ShipState GetDefaultState()
-	{
-		return ShipState.Alive;
+		return eShipState.Stay;
 	}
 
 	//Возвращает количество "Здоровья" в зависимости от типа корабля
-	public static int GetHealthByType(ShipType type)
+	public static int GetHealthByType(eShipType type)
 	{
 		var result = 0;
 
 		switch (type)
 		{
-			case ShipType.Small:
+			case eShipType.Small:
 				result = 1;
 				break;
-			case ShipType.Medium:
+			case eShipType.Medium:
 				result = 2;
 				break;
-			case ShipType.Big:
+			case eShipType.Big:
 				result = 3;
 				break;
 		}
@@ -95,19 +88,19 @@ public class ShipRepository : BaseBehaviour<ShipRepository>
 	}
 
 	//Возвращает количество "Силы" в зависимости от типа корабля
-	public static int GetPowerByType(ShipType type)
+	public static int GetPowerByType(eShipType type)
 	{
 		var result = 0;
 
 		switch (type)
 		{
-			case ShipType.Small:
+			case eShipType.Small:
 				result = 1;
 				break;
-			case ShipType.Medium:
+			case eShipType.Medium:
 				result = 2;
 				break;
-			case ShipType.Big:
+			case eShipType.Big:
 				result = 3;
 				break;
 		}

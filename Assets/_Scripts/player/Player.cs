@@ -24,18 +24,37 @@ public class Player : BasePlayer<Player>
 	{
 		if (!_fleatCreated)
 		{
-			var types = new List<ShipType>
+			var types = new List<eShipType>
 			{
-				ShipType.Small,
-				ShipType.Medium,
-				ShipType.Big
+				eShipType.Small,
+				eShipType.Medium,
+				eShipType.Big
 			};
 
 			this.CreateFleat(types);
 		}
 	}
 
-	protected override void CreateFleat(List<ShipType> types)
+	public void OnGUI()
+	{
+		var coor = PlaceController.GetCoordinateLastRow();
+		coor.y *= -1;
+
+		var screenCoor = Camera.main.WorldToScreenPoint(coor);
+		screenCoor.x -= 20;
+		screenCoor.y += 25;
+
+		var widthLabel = 150;
+		var heightLabel = 20;
+
+		var ships = ShipRepo.GetAllShips();
+
+		GUI.Label(new Rect(screenCoor.x, screenCoor.y, widthLabel, heightLabel), "Ship small: " + ships[eShipType.Small].CurrentState);
+		GUI.Label(new Rect(screenCoor.x, screenCoor.y + 20, widthLabel, heightLabel), "Ship middle: " + ships[eShipType.Medium].CurrentState);
+		GUI.Label(new Rect(screenCoor.x, screenCoor.y + 40, widthLabel, heightLabel), "Ship big: " + ships[eShipType.Big].CurrentState);
+	}
+
+	protected override void CreateFleat(List<eShipType> types)
 	{
 		foreach (var type in types)
 		{

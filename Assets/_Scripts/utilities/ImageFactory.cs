@@ -16,15 +16,15 @@ public class ImageFactory : BaseBehaviour<ImageFactory>
 		Current = this;
 	}
 
-	public Texture2D GetImageByType(ShipType type)
+	public Texture2D GetImageByType(eShipType type)
 	{
 		switch (type)
 		{
-			case ShipType.Small:
+			case eShipType.Small:
 				return SmallShipPicture;
-			case ShipType.Medium:
+			case eShipType.Medium:
 				return MediumShipPicture;
-			case ShipType.Big:
+			case eShipType.Big:
 				return BigShipPicture;
 		}
 		return null;
