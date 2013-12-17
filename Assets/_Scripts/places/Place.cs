@@ -24,11 +24,13 @@ public class Place : BaseBehaviour<Place>
 	{
 		if (GetSprite() == IFactory.IconMove)
 		{
-			CurrentShip.SetDestination(this.Position);
+			if (CurrentShip.CurrentState == eShipState.Selected)
+				CurrentShip.SetDestination(this.Position);
 		}
 		else if (GetSprite() == IFactory.IconAttack)
 		{
-			CurrentShip.SetTarget(this.Position);
+			if (CurrentShip.CurrentState == eShipState.Selected)
+				CurrentShip.SetTarget(this.Position);
 		}
 	}
 	

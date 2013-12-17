@@ -60,6 +60,7 @@ public class PlaceController : BaseBehaviour<PlaceController>
 		else
 		{
 			SetDefaultSprites();
+			Debug.Log("!");
 		}
 	}
 
