@@ -35,7 +35,7 @@ public class ShipRepository : BaseBehaviour<ShipRepository>
 		shipPrefab.Health = GetHealthByType(type);
 		shipPrefab.Power = GetPowerByType(type);
 		shipPrefab.CurrentState = GetDefaultAction();
-		shipPrefab.Type = type;
+		shipPrefab.CurrentType = type;
 		
 		return shipPrefab;
 	}
@@ -63,7 +63,7 @@ public class ShipRepository : BaseBehaviour<ShipRepository>
 	//Действие корабля по умолчанию
 	public static eShipState GetDefaultAction()
 	{
-		return eShipState.Stay;
+		return eShipState.Wait;
 	}
 
 	//Возвращает количество "Здоровья" в зависимости от типа корабля

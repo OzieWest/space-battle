@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
-using System;
+using System.Collections.Generic;
 
 public delegate void Callback();
 
@@ -49,28 +48,33 @@ public class FiniteStateMachine<S>
 
 	protected Dictionary<StateTransition<S>, System.Delegate> mTransitions;
 
-	public FiniteStateMachine() { mTransitions = new Dictionary<StateTransition<S>, System.Delegate>(); } // констр
-
-	public void Initialise(S state) { mState = state; } // инит
-
-	public void Advance(S nextState)
+	public FiniteStateMachine()
 	{
-		if (mbLocked) return;
+		mTransitions = new Dictionary<StateTransition<S>, System.Delegate>();
+	}
+
+	public void Initialise(S state) { mState = state; }
+
+	public S Advance(S nextState)
+	{
+		if (mbLocked) return mState;
 
 		var transition = new StateTransition<S>(mState, nextState);
-		
-		Delegate d;
-		if (mTransitions.TryGetValue(transition, out d))
+
+		System.Delegate d;
+		if (mTransitions.TryGetValue(transition, out d)) // new StateTransition(mState, nextState)
 		{
 			if (d != null)
 			{
-				var c = d as Callback;
+				Callback c = d as Callback;
 				c();
 			}
 
 			mPrevState = mState;
 			mState = nextState;
 		}
+
+		return mState;
 	}
 
 	public void AddTransition(S init, S end, Callback c)

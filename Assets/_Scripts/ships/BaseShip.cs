@@ -11,17 +11,18 @@ public enum eShipType
 
 public enum eShipState
 {
-	Stay,
-	Selected,
+	Wait,
+	Select,
 	Move,
 	Attack,
-	Explode
+	Explode,
+	Rest
 }
 
 public class BaseShip<U> : BaseBehaviour<U> where U: class
 {
 	#region Struct
-	public eShipType Type { get; set; }
+	public eShipType CurrentType { get; set; }
 	public eShipState CurrentState { get; set; }
 	public int Health { get; set; }
 	public int Power { get; set; }

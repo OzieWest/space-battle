@@ -51,7 +51,7 @@ public class PlaceController : BaseBehaviour<PlaceController>
 				}
 			}
 
-			var movementPlaces = CurrentShip.Location.GetNeighbors().Where(x => x.IsFree);
+			var movementPlaces = CurrentShip.CurrentLocation.GetNeighbors().Where(x => x.IsFree);
 			foreach (var movementPlace in movementPlaces)
 			{
 				movementPlace.SetSprite(IFactory.IconMove);
@@ -60,7 +60,6 @@ public class PlaceController : BaseBehaviour<PlaceController>
 		else
 		{
 			SetDefaultSprites();
-			Debug.Log("!");
 		}
 	}
 

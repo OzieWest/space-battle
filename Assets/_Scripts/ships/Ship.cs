@@ -14,39 +14,38 @@ public class Ship : BaseShip<Ship>
 
 	private Boolean IsSelected { get { return Current == this; } }
 
-	private Boolean IsTrue { get; set; }
-
 	public PlaceController PlaceController { get { return PlaceController.Current; } }
-	public Place Location { get; set; }
+	public Place CurrentLocation { get; set; }
 
 	public void Start()
 	{
-		IsTrue = true;
-
 		fsm = new ShipFSM();
 
-		fsm.AddTransition(eShipState.Stay, eShipState.Stay, Stay);
-		fsm.AddTransition(eShipState.Stay, eShipState.Explode, Explode);
-		fsm.AddTransition(eShipState.Stay, eShipState.Selected, Select);
+		fsm.AddTransition(eShipState.Wait, eShipState.Wait, Wait);
+		fsm.AddTransition(eShipState.Wait, eShipState.Explode, Explode);
+		fsm.AddTransition(eShipState.Wait, eShipState.Select, Select);
 
-		fsm.AddTransition(eShipState.Selected, eShipState.Selected, Select);
-		fsm.AddTransition(eShipState.Selected, eShipState.Stay, Stay);
-		fsm.AddTransition(eShipState.Selected, eShipState.Attack, Attack);
-		fsm.AddTransition(eShipState.Selected, eShipState.Move, Move);
+		fsm.AddTransition(eShipState.Select, eShipState.Select, Select);
+		fsm.AddTransition(eShipState.Select, eShipState.Wait, Wait);
+		fsm.AddTransition(eShipState.Select, eShipState.Attack, Attack);
+		fsm.AddTransition(eShipState.Select, eShipState.Move, Move);
 
 		fsm.AddTransition(eShipState.Attack, eShipState.Attack, Attack);
-		fsm.AddTransition(eShipState.Attack, eShipState.Stay, Stay);
+		fsm.AddTransition(eShipState.Attack, eShipState.Rest, Rest);
 
 		fsm.AddTransition(eShipState.Move, eShipState.Move, Move);
-		fsm.AddTransition(eShipState.Move, eShipState.Stay, Stay);
+		fsm.AddTransition(eShipState.Move, eShipState.Rest, Rest);
+
+		fsm.AddTransition(eShipState.Rest, eShipState.Rest, Rest);
+		fsm.AddTransition(eShipState.Rest, eShipState.Wait, Wait);
 
 		fsm.AddTransition(eShipState.Explode, eShipState.Explode, Explode);
 	}
 
 	public void Update() //loop
 	{
-		CurrentState = GetState();
-		fsm.Advance(CurrentState);
+		var nextPossibleState = GetState();
+		CurrentState = fsm.Advance(nextPossibleState);
 	}
 
 	private eShipState GetState()
@@ -54,57 +53,52 @@ public class Ship : BaseShip<Ship>
 		if (Health <= 0)
 			return eShipState.Explode;
 
-		if (IsTrue && _endPosition != Vector3.zero)
+		if (_endPosition != Vector3.zero)
 			return eShipState.Move;
 
-		if (IsTrue && _targetPosition != Vector3.zero)
+		if (_targetPosition != Vector3.zero)
 			return eShipState.Attack;
 
-		if (IsSelected && IsSelectable)
-			return eShipState.Selected;
+		if (!IsSelectable)
+			return eShipState.Rest;
+
+		if (IsSelected)
+			return eShipState.Select;
 		else
-			return eShipState.Stay;
+			return eShipState.Wait;
 	}
 
 	public void OnTriggerEnter(Collider other) // oneTime
 	{
-		if (other.tag == "Place" && CurrentState == eShipState.Stay) SetLocation(other.gameObject);
+		if (other.tag == "Place" && CurrentState == eShipState.Wait || CurrentState == eShipState.Rest)
+		{
+			_setCurrentLocation(other.gameObject);
+		}
 	}
 
 	public void OnMouseDown()
 	{
-		if (IsSelectable) Current = IsSelected ? null : this;
+		_toggleSelection();
 	}
 
-	public void OnGUI() //loop
+	#region Selection
+	private void _toggleSelection()
 	{
-		//if (CurrentState == eShipState.Selected)
-		//{
-		//	var coor = PlaceController.GetCoordinateLastRow();
-		//	coor.y *= -1;
-
-		//	var screenCoor = Camera.main.WorldToScreenPoint(coor);
-		//	screenCoor.x -= 20;
-		//	screenCoor.y += 25;
-
-		//	var widthLabel = 150;
-		//	var heightLabel = 20;
-
-		//	GUI.Label(new Rect(screenCoor.x, screenCoor.y, widthLabel, heightLabel), "*" + Type + "Ship*");
-		//	GUI.Label(new Rect(screenCoor.x, screenCoor.y + 20, widthLabel, heightLabel), "Health: " + Health);
-		//	GUI.Label(new Rect(screenCoor.x + 60, screenCoor.y + 20, widthLabel, heightLabel), "Power: " + Power);
-		//}
+		//ИСПРАВИТЬ - поставить условие if(PlayerWait)
+		if (IsSelectable) Current = IsSelected ? null : this;
 	}
 
 	public void Deselect()
 	{
-		Current = null;
+		if(IsSelectable) IsSelectable = false;
+		if(IsSelected) Current = null;
 	}
+	#endregion
 
-	public void SetLocation(GameObject placeObject)
+	private void _setCurrentLocation(GameObject placeObject)
 	{
-		Location = placeObject.GetComponent<Place>();
-		Location.Close();
+		CurrentLocation = placeObject.GetComponent<Place>();
+		CurrentLocation.Close();
 	}
 
 	public void SetTarget(Vector3 targetPosition)
@@ -118,70 +112,51 @@ public class Ship : BaseShip<Ship>
 	}
 
 	#region Actions
-	protected void Stay()
+	protected void Rest()
 	{
-		if (IsSelected) GameSettings.Log(MethodBase.GetCurrentMethod().Name);
+		
+	}
+
+	protected void Wait()
+	{
+		//if (CurrentType == eShipType.Small) InDebug("ship Wait");
 	}
 
 	protected void Select()
 	{
-		if (IsSelected) GameSettings.Log(MethodBase.GetCurrentMethod().Name);
 	}
 
 	protected void Explode()
 	{
-		IsSelectable = false;
-		if (IsSelected) GameSettings.Log(MethodBase.GetCurrentMethod().Name);
+		Deselect();
 	}
 
 	protected void Attack()
 	{
-		if (IsSelected) GameSettings.Log(MethodBase.GetCurrentMethod().Name);
+		Deselect();
 
-		IsSelectable = false;
+		if (_targetPosition != Vector3.zero)
+		{
+			var bullet = Inst<Bullet>(PFactory.Bullet, this.Position, Quaternion.identity);
+			bullet.SendTo(_targetPosition);
 
-		//if (_targetPosition != Vector3.zero)
-		//{
-		//	var bullet = Inst<Bullet>(PFactory.Bullet, this.Position, Quaternion.identity);
-		//	bullet.SendTo(_targetPosition);
-
-		//	_targetPosition = Vector3.zero;
-		//	IsSelectable = false;
-
-		//	Deselect();
-		//}
+			_targetPosition = Vector3.zero; // reset target
+		}
 	}
 
 	protected void Move()
 	{
-		if (IsSelected) GameSettings.Log(MethodBase.GetCurrentMethod().Name);
-
-		IsSelectable = false;
+		Deselect();
 
 		if (!IsSelectable)
 		{
-			if (!Location.IsFree)
-				Location.Open();
+			if (!CurrentLocation.IsFree)
+				CurrentLocation.Open();
 
-			Position = Vector3.Lerp(Position, _endPosition, Time.deltaTime*_moveSpeed);
+			Position = Vector3.Lerp(Position, _endPosition, Time.deltaTime * _moveSpeed);
 
-			if (Position == _endPosition)
-			{
-				_endPosition = Vector3.zero;
-				IsTrue = false;
-			}
-
-			Deselect();
+			if (Position == _endPosition) _endPosition = Vector3.zero; //reset path
 		}
-
-		//if (_endPosition != Vector3.zero)
-		//{
-		//	if (!IsMove)
-		//	{
-		//		Location.Open();
-		//		Deselect();
-		//		Action = ShipAction.Move;
-		//	}
 	}
 	#endregion
 }
