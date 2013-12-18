@@ -19,6 +19,8 @@ public class Ship : BaseShip<Ship>
 
 	public void Start()
 	{
+		_endPosition = Position;
+
 		fsm = new ShipFSM();
 
 		fsm.AddTransition(eShipState.Wait, eShipState.Wait, Wait);
@@ -53,7 +55,7 @@ public class Ship : BaseShip<Ship>
 		if (Health <= 0)
 			return eShipState.Explode;
 
-		if (_endPosition != Vector3.zero)
+		if (_endPosition != Position)
 			return eShipState.Move;
 
 		if (_targetPosition != Vector3.zero)
@@ -62,10 +64,7 @@ public class Ship : BaseShip<Ship>
 		if (!IsSelectable)
 			return eShipState.Rest;
 
-		if (IsSelected)
-			return eShipState.Select;
-		else
-			return eShipState.Wait;
+		return IsSelected ? eShipState.Select : eShipState.Wait;
 	}
 
 	public void OnTriggerEnter(Collider other) // oneTime
@@ -84,14 +83,13 @@ public class Ship : BaseShip<Ship>
 	#region Selection
 	private void _toggleSelection()
 	{
-		//ИСПРАВИТЬ - поставить условие if(PlayerWait)
-		if (IsSelectable) Current = IsSelected ? null : this;
+		if (IsSelectable) Current = IsSelected ? null : this; //ИСПРАВИТЬ - поставить условие if(PlayerWait)
 	}
 
 	public void Deselect()
 	{
-		if(IsSelectable) IsSelectable = false;
-		if(IsSelected) Current = null;
+		if (IsSelectable) IsSelectable = false;
+		if (IsSelected) Current = null;
 	}
 	#endregion
 
@@ -114,7 +112,7 @@ public class Ship : BaseShip<Ship>
 	#region Actions
 	protected void Rest()
 	{
-		
+
 	}
 
 	protected void Wait()
@@ -135,28 +133,24 @@ public class Ship : BaseShip<Ship>
 	{
 		Deselect();
 
-		if (_targetPosition != Vector3.zero)
-		{
-			var bullet = Inst<Bullet>(PFactory.Bullet, this.Position, Quaternion.identity);
-			bullet.SendTo(_targetPosition);
+		var bullet = Inst<Bullet>(PFactory.Bullet, this.Position, Quaternion.identity);
+		bullet.SendTo(_targetPosition);
 
-			_targetPosition = Vector3.zero; // reset target
-		}
+		//reset TARGET
+		_targetPosition = Vector3.zero;
 	}
 
 	protected void Move()
 	{
 		Deselect();
 
-		if (!IsSelectable)
-		{
-			if (!CurrentLocation.IsFree)
-				CurrentLocation.Open();
+		if (!CurrentLocation.IsFree)
+			CurrentLocation.Open();
 
-			Position = Vector3.Lerp(Position, _endPosition, Time.deltaTime * _moveSpeed);
+		Position = Vector3.Lerp(Position, _endPosition, Time.deltaTime * _moveSpeed);
 
-			if (Position == _endPosition) _endPosition = Vector3.zero; //reset path
-		}
+		//reset PATH
+		//if (Position == _endPosition) _endPosition = Vector3.zero;
 	}
 	#endregion
 }

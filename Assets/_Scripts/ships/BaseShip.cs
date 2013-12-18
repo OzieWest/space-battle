@@ -42,6 +42,5 @@ public class BaseShip<U> : BaseBehaviour<U> where U: class
 		_moveSpeed = 4f;
 
 		WindowGui = new Rect(5, 80, 150, 400);
-		_endPosition = Vector3.zero;
 	}
 }

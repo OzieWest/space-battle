@@ -49,9 +49,15 @@ public class Player : BasePlayer<Player>
 
 		var ships = ShipRepo.GetAllShips();
 
-		GUI.Label(new Rect(screenCoor.x, screenCoor.y, widthLabel, heightLabel), "Ship small: " + ships[eShipType.Small].CurrentState);
-		GUI.Label(new Rect(screenCoor.x, screenCoor.y + 20, widthLabel, heightLabel), "Ship middle: " + ships[eShipType.Medium].CurrentState);
-		GUI.Label(new Rect(screenCoor.x, screenCoor.y + 40, widthLabel, heightLabel), "Ship big: " + ships[eShipType.Big].CurrentState);
+		if (ships.Count > 2)
+		{
+			GUI.Label(new Rect(screenCoor.x, screenCoor.y, widthLabel, heightLabel),
+				"Ship small: " + ships[eShipType.Small].CurrentState);
+			GUI.Label(new Rect(screenCoor.x, screenCoor.y + 20, widthLabel, heightLabel),
+				"Ship middle: " + ships[eShipType.Medium].CurrentState);
+			GUI.Label(new Rect(screenCoor.x, screenCoor.y + 40, widthLabel, heightLabel),
+				"Ship big: " + ships[eShipType.Big].CurrentState);
+		}
 	}
 
 	protected override void CreateFleat(List<eShipType> types)

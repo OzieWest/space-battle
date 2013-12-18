@@ -56,7 +56,7 @@ public class BaseBehaviour<U> : MonoBehaviour where U: class
 		return Ship.Current != null;
 	}
 
-	public void InDebug(String message)
+	public void InDebug(object message)
 	{
 		Debug.Log(message);
 	}
