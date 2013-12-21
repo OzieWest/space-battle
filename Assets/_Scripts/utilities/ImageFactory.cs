@@ -7,14 +7,13 @@ public class ImageFactory : BaseBehaviour<ImageFactory>
 	public Texture2D MediumShipPicture;
 	public Texture2D BigShipPicture;
 
-	public Sprite IconDefault;
-	public Sprite IconMove;
-	public Sprite IconAttack;
+	public Sprite PlaceOpen;
+	public Sprite PlaceClose;
+	public Sprite PlaceWait;
+	public Sprite PlaceAttack;
+	public Sprite PlaceMove;
 
-	public void Start()
-	{
-		Current = this;
-	}
+	public void Awake() { Current = this; }
 
 	public Texture2D GetImageByType(eShipType type)
 	{

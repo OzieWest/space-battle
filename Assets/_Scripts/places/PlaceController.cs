@@ -19,13 +19,16 @@ public class PlaceController : BaseBehaviour<PlaceController>
 
 	public Ship CurrentShip { get { return Ship.Current; } }
 
-	public PlaceController() { Current = this; Places = new List<List<Place>>(); } // конструктор
+	public void Awake()
+	{
+		Current = this; 
+		Places = new List<List<Place>>();
+	}
 
 	public void Start()
 	{
-		CreateGrid();
-
-		ConfiguratePlace();
+		_сreateGrid();
+		_сonfiguratePlace();
 	}
 
 	public void OnGUI()
@@ -33,9 +36,10 @@ public class PlaceController : BaseBehaviour<PlaceController>
 		var count = 0;
 		foreach (var place in this)
 		{
-			if (!place.IsFree)
+			if (!place.IsOpen)
 				count++;
 		}
+
 		GUI.Label(new Rect(0, 0, 200, 50), count.ToString());
 	}
 
@@ -43,18 +47,22 @@ public class PlaceController : BaseBehaviour<PlaceController>
 	{
 		if (IsShipSelect())
 		{
+			//attack range
 			foreach (var place in this)
 			{
-				if (place.GetSprite() != IFactory.IconAttack && place.IsFree)
+				if (place.IsOpen)
 				{
-					place.SetSprite(IFactory.IconAttack);
+					place.IsAttack = true;
+					place.IsNeighbor = false;
 				}
 			}
 
-			var movementPlaces = CurrentShip.CurrentLocation.GetNeighbors().Where(x => x.IsFree);
+			//move range
+			var movementPlaces = CurrentShip.CurrentLocation.GetNeighbors().Where(x => x.IsOpen);
 			foreach (var movementPlace in movementPlaces)
 			{
-				movementPlace.SetSprite(IFactory.IconMove);
+				movementPlace.IsNeighbor = true;
+				movementPlace.IsAttack = false;
 			}
 		}
 		else
@@ -63,49 +71,12 @@ public class PlaceController : BaseBehaviour<PlaceController>
 		}
 	}
 
-	public Vector3 GetCoordinateLastRow()
-	{
-		var place = Places[Rows - 1][0];
-		return place.Position;
-	}
-
 	public void SetDefaultSprites()
 	{
 		foreach (var place in this)
 		{
-			if (place.GetSprite() != IFactory.IconDefault)
-			{
-				place.SetSprite(IFactory.IconDefault);
-			}
-		}
-	}
-
-	public IEnumerator<Place> GetEnumerator()
-	{
-		return Places.SelectMany(placeList => placeList).GetEnumerator();
-	}
-
-	protected void CreateGrid()
-	{
-		var startVector = Camera.main.ScreenToWorldPoint(new Vector3(50, Screen.height - 50, 20));
-		var startX = startVector.x;
-
-		for (var i = 0; i < Rows; i++)
-		{
-			var innerList = new List<Place>();
-
-			for (var j = 0; j < Columns; j++)
-			{
-				var newPlace = CreatePlace(startVector);
-				innerList.Add(newPlace);
-
-				startVector.x += PlaceScale + Offset;
-			}
-			
-			Places.Add(innerList);
-
-			startVector.x = startX;
-			startVector.y -= PlaceScale + Offset;
+			place.IsNeighbor = false;
+			place.IsAttack = false;
 		}
 	}
 
@@ -116,23 +87,61 @@ public class PlaceController : BaseBehaviour<PlaceController>
 
 		var place = Places[firstInt][secondInt];
 
-		if (!place.IsFree)
+		if (!place.IsOpen)
 			place = GetRandomPlace();
 
 		return place;
 	}
 
-	protected Place CreatePlace(Vector3 position)
+	#region Support Method
+	public IEnumerator<Place> GetEnumerator()
+	{
+		return Places.SelectMany(placeList => placeList).GetEnumerator();
+	}
+
+	public Vector3 GetCoordinateLastRow()
+	{
+		var place = Places[Rows - 1][0];
+		return place.Position;
+	}
+	#endregion
+
+	#region Init
+	protected void _сreateGrid()
+	{
+		var startVector = Camera.main.ScreenToWorldPoint(new Vector3(50, Screen.height - 50, 20));
+		var startX = startVector.x;
+
+		for (var i = 0; i < Rows; i++)
+		{
+			var innerList = new List<Place>();
+
+			for (var j = 0; j < Columns; j++)
+			{
+				var newPlace = _сreatePlace(startVector);
+				innerList.Add(newPlace);
+
+				startVector.x += PlaceScale + Offset;
+			}
+
+			Places.Add(innerList);
+
+			startVector.x = startX;
+			startVector.y -= PlaceScale + Offset;
+		}
+	}
+
+	protected Place _сreatePlace(Vector3 position)
 	{
 		var result = Inst(PrefabFactory.Current.Place, position, transform.rotation);
 
 		var place = result.GetComponent<Place>();
-		place.SetSprite(IFactory.IconDefault);
+		place.SetSprite(IFactory.PlaceOpen);
 
 		return place;
 	}
 
-	protected void ConfiguratePlace()
+	protected void _сonfiguratePlace()
 	{
 		for (var i = 0; i < Places.Count; i++)
 		{
@@ -162,4 +171,5 @@ public class PlaceController : BaseBehaviour<PlaceController>
 			}
 		}
 	}
+	#endregion
 }

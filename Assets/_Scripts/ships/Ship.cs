@@ -17,7 +17,7 @@ public class Ship : BaseShip<Ship>
 	public PlaceController PlaceController { get { return PlaceController.Current; } }
 	public Place CurrentLocation { get; set; }
 
-	public void Start()
+	public void Awake()
 	{
 		_endPosition = Position;
 
@@ -47,7 +47,7 @@ public class Ship : BaseShip<Ship>
 	public void Update() //loop
 	{
 		var nextPossibleState = GetState();
-		CurrentState = fsm.Advance(nextPossibleState);
+		State = fsm.Advance(nextPossibleState);
 	}
 
 	private eShipState GetState()
@@ -69,9 +69,17 @@ public class Ship : BaseShip<Ship>
 
 	public void OnTriggerEnter(Collider other) // oneTime
 	{
-		if (other.tag == "Place" && CurrentState == eShipState.Wait || CurrentState == eShipState.Rest)
+		if (other.tag == "Place" && State == eShipState.Move || State == eShipState.Wait)
 		{
-			_setCurrentLocation(other.gameObject);
+			_openCurrentLocation(other.gameObject);
+		}
+	}
+
+	public void OnTriggerExit(Collider other) // oneTime
+	{
+		if (other.tag == "Place" && State == eShipState.Move)
+		{
+			_closeCurrentLocation(other.gameObject);
 		}
 	}
 
@@ -93,10 +101,16 @@ public class Ship : BaseShip<Ship>
 	}
 	#endregion
 
-	private void _setCurrentLocation(GameObject placeObject)
+	private void _openCurrentLocation(GameObject placeObject)
 	{
 		CurrentLocation = placeObject.GetComponent<Place>();
-		CurrentLocation.Close();
+		CurrentLocation.IsOpen = false;
+	}
+
+	private void _closeCurrentLocation(GameObject placeObject)
+	{
+		CurrentLocation = placeObject.GetComponent<Place>();
+		CurrentLocation.IsOpen = true;
 	}
 
 	public void SetTarget(Vector3 targetPosition)
@@ -142,10 +156,13 @@ public class Ship : BaseShip<Ship>
 
 	protected void Move()
 	{
-		Deselect();
-
-		if (!CurrentLocation.IsFree)
+		if (IsSelectable)
+		{
+			//open once
 			CurrentLocation.Open();
+		}
+
+		Deselect();
 
 		Position = Vector3.Lerp(Position, _endPosition, Time.deltaTime * _moveSpeed);
 

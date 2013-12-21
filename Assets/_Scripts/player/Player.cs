@@ -49,14 +49,14 @@ public class Player : BasePlayer<Player>
 
 		var ships = ShipRepo.GetAllShips();
 
-		if (ships.Count > 2)
+		if (_fleatCreated)
 		{
 			GUI.Label(new Rect(screenCoor.x, screenCoor.y, widthLabel, heightLabel),
-				"Ship small: " + ships[eShipType.Small].CurrentState);
+				"Ship small: " + ships[eShipType.Small].State);
 			GUI.Label(new Rect(screenCoor.x, screenCoor.y + 20, widthLabel, heightLabel),
-				"Ship middle: " + ships[eShipType.Medium].CurrentState);
+				"Ship middle: " + ships[eShipType.Medium].State);
 			GUI.Label(new Rect(screenCoor.x, screenCoor.y + 40, widthLabel, heightLabel),
-				"Ship big: " + ships[eShipType.Big].CurrentState);
+				"Ship big: " + ships[eShipType.Big].State);
 		}
 	}
 

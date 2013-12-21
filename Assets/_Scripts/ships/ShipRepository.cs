@@ -34,7 +34,7 @@ public class ShipRepository : BaseBehaviour<ShipRepository>
 		var shipPrefab = prefab.GetComponent<Ship>();
 		shipPrefab.Health = GetHealthByType(type);
 		shipPrefab.Power = GetPowerByType(type);
-		shipPrefab.CurrentState = GetDefaultAction();
+		shipPrefab.State = GetDefaultAction();
 		shipPrefab.CurrentType = type;
 		
 		return shipPrefab;

@@ -23,7 +23,7 @@ public class BaseShip<U> : BaseBehaviour<U> where U: class
 {
 	#region Struct
 	public eShipType CurrentType { get; set; }
-	public eShipState CurrentState { get; set; }
+	public eShipState State { get; set; }
 	public int Health { get; set; }
 	public int Power { get; set; }
 	#endregion
