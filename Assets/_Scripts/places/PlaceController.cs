@@ -21,7 +21,7 @@ public class PlaceController : BaseBehaviour<PlaceController>
 
 	public void Awake()
 	{
-		Current = this; 
+		Current = this;
 		Places = new List<List<Place>>();
 	}
 
@@ -33,24 +33,48 @@ public class PlaceController : BaseBehaviour<PlaceController>
 
 	public void OnGUI()
 	{
-		var count = 0;
+		var closedPlace = 0;
+		var destroyedPlace = 0;
+		var openPlace = 0;
+		var attackPlace = 0;
+		var movePlace = 0;
+
 		foreach (var place in this)
 		{
-			if (!place.IsOpen)
-				count++;
+			if (place.State == ePlaceState.Close)
+				closedPlace++;
+
+			if (place.State == ePlaceState.Open)
+				openPlace++;
+
+			if (place.State == ePlaceState.Destroyed)
+				destroyedPlace++;
+
+			if (place.State == ePlaceState.Attack)
+				attackPlace++;
+
+			if (place.State == ePlaceState.Move)
+				movePlace++;
 		}
 
-		GUI.Label(new Rect(0, 0, 200, 50), count.ToString());
+		var xPos = 500;
+
+		GUI.Label(new Rect(xPos, 0, 200, 50), "Open: " + openPlace.ToString());
+		GUI.Label(new Rect(xPos, 15, 200, 50), "Close: " + closedPlace.ToString());
+		GUI.Label(new Rect(xPos, 30, 200, 50), "Move: " + movePlace.ToString());
+		GUI.Label(new Rect(xPos, 45, 200, 50), "Attack: " + attackPlace.ToString());
+		GUI.Label(new Rect(xPos, 60, 200, 50), "Destr: " + destroyedPlace.ToString());
 	}
 
 	public void Update()
 	{
 		if (IsShipSelect())
 		{
+			Debug.Log("!");
 			//attack range
 			foreach (var place in this)
 			{
-				if (place.IsOpen)
+				if (place.State == ePlaceState.Open)
 				{
 					place.IsAttack = true;
 					place.IsNeighbor = false;
@@ -58,7 +82,7 @@ public class PlaceController : BaseBehaviour<PlaceController>
 			}
 
 			//move range
-			var movementPlaces = CurrentShip.CurrentLocation.GetNeighbors().Where(x => x.IsOpen);
+			var movementPlaces = CurrentShip.CurrentLocation.GetNeighbors().Where(x => x.State != ePlaceState.Close);
 			foreach (var movementPlace in movementPlaces)
 			{
 				movementPlace.IsNeighbor = true;
@@ -67,16 +91,11 @@ public class PlaceController : BaseBehaviour<PlaceController>
 		}
 		else
 		{
-			SetDefaultSprites();
-		}
-	}
-
-	public void SetDefaultSprites()
-	{
-		foreach (var place in this)
-		{
-			place.IsNeighbor = false;
-			place.IsAttack = false;
+			foreach (var place in this)
+			{
+				if (place.State != ePlaceState.Destroyed || place.State != ePlaceState.Close)
+					place.ActionDefault();
+			}
 		}
 	}
 
@@ -89,6 +108,8 @@ public class PlaceController : BaseBehaviour<PlaceController>
 
 		if (!place.IsOpen)
 			place = GetRandomPlace();
+
+		place.IsOpen = false;
 
 		return place;
 	}
@@ -119,8 +140,8 @@ public class PlaceController : BaseBehaviour<PlaceController>
 			for (var j = 0; j < Columns; j++)
 			{
 				var newPlace = _сreatePlace(startVector);
+				newPlace.Index = new[] { i, j };
 				innerList.Add(newPlace);
-
 				startVector.x += PlaceScale + Offset;
 			}
 

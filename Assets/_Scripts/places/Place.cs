@@ -10,20 +10,22 @@ public enum ePlaceState
 	Close,
 	Attack,
 	Move,
-	Wait
+	Destroyed
 }
 
 public class PlaceFSM : FiniteStateMachine<ePlaceState> { }
 
 public class Place : BaseBehaviour<Place>
 {
+	public int[] Index { get; set; } //Для диагностики
+
 	private PlaceFSM fsm;
 	public String FsmSymbol { get; set; }
-	
-	public Boolean IsChecked { get; set; }
+
 	public Boolean IsOpen { get; set; }
 	public Boolean IsNeighbor { get; set; }
 	public Boolean IsAttack { get; set; }
+	public Boolean IsChecked { get; set; }
 
 	public ePlaceState State { get; set; }
 
@@ -37,36 +39,39 @@ public class Place : BaseBehaviour<Place>
 
 	public void Awake()
 	{
+		Index = new int[2];
+
 		IsOpen = true;
-		IsAttack = false;
 		IsNeighbor = false;
+		IsAttack = false;
 		IsChecked = false;
+		State = ePlaceState.Open;
 
 		SpriteRenderer = gameObject.GetComponent<SpriteRenderer>();
 
 		fsm = new PlaceFSM();
 
-		fsm.AddTransition(ePlaceState.Open, ePlaceState.Open, Open);
-		fsm.AddTransition(ePlaceState.Open, ePlaceState.Move, Move);
-		fsm.AddTransition(ePlaceState.Open, ePlaceState.Attack, Attack);
+		fsm.AddTransition(ePlaceState.Open, ePlaceState.Open, ActionOpen);
+		fsm.AddTransition(ePlaceState.Open, ePlaceState.Move, ActionMove);
+		fsm.AddTransition(ePlaceState.Open, ePlaceState.Attack, ActionAttack);
+		fsm.AddTransition(ePlaceState.Open, ePlaceState.Close, ActionClose);
 
-		fsm.AddTransition(ePlaceState.Close, ePlaceState.Close, Close);
-		fsm.AddTransition(ePlaceState.Close, ePlaceState.Open, Open);
+		fsm.AddTransition(ePlaceState.Close, ePlaceState.Close, ActionClose);
+		fsm.AddTransition(ePlaceState.Close, ePlaceState.Open, ActionOpen);
 
-		fsm.AddTransition(ePlaceState.Move, ePlaceState.Move, Move);
-		fsm.AddTransition(ePlaceState.Move, ePlaceState.Open, Open);
-		fsm.AddTransition(ePlaceState.Move, ePlaceState.Wait, Wait);
+		fsm.AddTransition(ePlaceState.Move, ePlaceState.Move, ActionMove);
+		fsm.AddTransition(ePlaceState.Move, ePlaceState.Open, ActionOpen);
 
-		fsm.AddTransition(ePlaceState.Attack, ePlaceState.Attack, Attack);
-		fsm.AddTransition(ePlaceState.Attack, ePlaceState.Open, Open);
+		fsm.AddTransition(ePlaceState.Attack, ePlaceState.Attack, ActionAttack);
+		fsm.AddTransition(ePlaceState.Attack, ePlaceState.Open, ActionOpen);
+		fsm.AddTransition(ePlaceState.Attack, ePlaceState.Destroyed, ActionDestroyed);
 
-		fsm.AddTransition(ePlaceState.Wait, ePlaceState.Wait, Wait);
-		fsm.AddTransition(ePlaceState.Wait, ePlaceState.Close, Close);
+		fsm.AddTransition(ePlaceState.Destroyed, ePlaceState.Destroyed, ActionDestroyed);
 	}
 
 	public void Update()
 	{
-		var nextPossibleState = GetState();
+		var nextPossibleState = GetPossibleState();
 		State = fsm.Advance(nextPossibleState);
 	}
 
@@ -102,8 +107,11 @@ public class Place : BaseBehaviour<Place>
 	#endregion
 
 	#region Actions
-	protected ePlaceState GetState()
+	protected ePlaceState GetPossibleState()
 	{
+		if (IsChecked)
+			return ePlaceState.Destroyed;
+
 		if (IsAttack)
 			return ePlaceState.Attack;
 
@@ -112,38 +120,48 @@ public class Place : BaseBehaviour<Place>
 
 		if (IsOpen)
 			return ePlaceState.Open;
-		else
-			return ePlaceState.Close;
+		
+		return ePlaceState.Close;
 	}
 
-	public void Wait()
+	public void ActionDestroyed()
 	{
 		if (SpriteRenderer.sprite != IFactory.PlaceWait)
 			SpriteRenderer.sprite = IFactory.PlaceWait;
+
+		IsChecked = true;
+		IsAttack = false;
+		IsNeighbor = false;
 	}
 
-	public void Move()
+	public void ActionMove()
 	{
 		if (SpriteRenderer.sprite != IFactory.PlaceMove)
 			SpriteRenderer.sprite = IFactory.PlaceMove;
 	}
 
-	public void Attack()
+	public void ActionAttack()
 	{
 		if (SpriteRenderer.sprite != IFactory.PlaceAttack)
 			SpriteRenderer.sprite = IFactory.PlaceAttack;
 	}
 
-	public void Open()
+	public void ActionOpen()
 	{
 		if (SpriteRenderer.sprite != IFactory.PlaceOpen)
 			SpriteRenderer.sprite = IFactory.PlaceOpen;
 	}
 
-	public void Close()
+	public void ActionClose()
 	{
 		if (SpriteRenderer.sprite != IFactory.PlaceClose)
 			SpriteRenderer.sprite = IFactory.PlaceClose;
+	}
+
+	public void ActionDefault()
+	{
+		IsAttack = false;
+		IsNeighbor = false;
 	}
 	#endregion
 

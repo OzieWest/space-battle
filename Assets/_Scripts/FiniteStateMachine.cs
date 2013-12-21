@@ -73,6 +73,10 @@ public class FiniteStateMachine<S>
 			mPrevState = mState;
 			mState = nextState;
 		}
+		else
+		{
+			Debug.Log("error state: " + mState + " | " +  nextState);
+		}
 
 		return mState;
 	}

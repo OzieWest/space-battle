@@ -22,11 +22,13 @@ public enum eShipState
 public class BaseShip<U> : BaseBehaviour<U> where U: class
 {
 	#region Struct
-	public eShipType CurrentType { get; set; }
+	public eShipType Type { get; set; }
 	public eShipState State { get; set; }
 	public int Health { get; set; }
 	public int Power { get; set; }
 	#endregion
+
+	public Ship PrevShip { get; set; }
 
 	protected Vector3 _targetPosition;
 	protected Vector3 _endPosition;

@@ -29,7 +29,7 @@ public class EnemyBot : BasePlayer<EnemyBot>
 		foreach (var type in types)
 		{
 			var freePlace = PlaceController.GetRandomPlace();
-			freePlace.Close();
+			freePlace.ActionClose();
 			ShipRepo.CreateShip(type, freePlace.Position);
 		}
 

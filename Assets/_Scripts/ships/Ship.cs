@@ -71,7 +71,7 @@ public class Ship : BaseShip<Ship>
 	{
 		if (other.tag == "Place" && State == eShipState.Move || State == eShipState.Wait)
 		{
-			_openCurrentLocation(other.gameObject);
+			_closeCurrentLocation(other.gameObject);
 		}
 	}
 
@@ -79,7 +79,7 @@ public class Ship : BaseShip<Ship>
 	{
 		if (other.tag == "Place" && State == eShipState.Move)
 		{
-			_closeCurrentLocation(other.gameObject);
+			_openCurrentLocation(other.gameObject);
 		}
 	}
 
@@ -91,7 +91,10 @@ public class Ship : BaseShip<Ship>
 	#region Selection
 	private void _toggleSelection()
 	{
-		if (IsSelectable) Current = IsSelected ? null : this; //ИСПРАВИТЬ - поставить условие if(PlayerWait)
+		PrevShip = Current;
+
+		if (IsSelectable) 
+			Current = IsSelected ? null : this; //ИСПРАВИТЬ - поставить условие if(PlayerWait)
 	}
 
 	public void Deselect()
@@ -101,17 +104,19 @@ public class Ship : BaseShip<Ship>
 	}
 	#endregion
 
-	private void _openCurrentLocation(GameObject placeObject)
+	#region Location
+	private void _closeCurrentLocation(GameObject placeObject)
 	{
 		CurrentLocation = placeObject.GetComponent<Place>();
 		CurrentLocation.IsOpen = false;
 	}
 
-	private void _closeCurrentLocation(GameObject placeObject)
+	private void _openCurrentLocation(GameObject placeObject)
 	{
 		CurrentLocation = placeObject.GetComponent<Place>();
 		CurrentLocation.IsOpen = true;
 	}
+	#endregion
 
 	public void SetTarget(Vector3 targetPosition)
 	{
@@ -131,7 +136,7 @@ public class Ship : BaseShip<Ship>
 
 	protected void Wait()
 	{
-		//if (CurrentType == eShipType.Small) InDebug("ship Wait");
+		//if (Type == eShipType.Small) InDebug("ship ActionDestroyed");
 	}
 
 	protected void Select()
@@ -156,12 +161,6 @@ public class Ship : BaseShip<Ship>
 
 	protected void Move()
 	{
-		if (IsSelectable)
-		{
-			//open once
-			CurrentLocation.Open();
-		}
-
 		Deselect();
 
 		Position = Vector3.Lerp(Position, _endPosition, Time.deltaTime * _moveSpeed);

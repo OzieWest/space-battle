@@ -65,7 +65,6 @@ public class Player : BasePlayer<Player>
 		foreach (var type in types)
 		{
 			var freePlace = PlaceController.GetRandomPlace();
-			freePlace.Close();
 			ShipRepo.CreateShip(type, freePlace.Position);
 		}
 
